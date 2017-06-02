@@ -1,0 +1,91 @@
+﻿<UserControl x:Class="KSPExtensions.ToolWindows.LocalizerSettingsWindowControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             Background="{DynamicResource VsBrush.Window}"
+             Foreground="{DynamicResource VsBrush.WindowText}"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300"
+             Name="MyToolWindow">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="15"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="13"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0" FontWeight="Bold" VerticalAlignment="Center">Selected Project:</TextBlock>
+            <ComboBox Grid.Row="0" Grid.Column="2" Margin="2" Name="projectsList" SelectionChanged="TagComboChanged" Text="Project Based" >
+                <ComboBoxItem IsSelected="True">None</ComboBoxItem>
+            </ComboBox>
+        </Grid>
+        <Grid Grid.Row="1" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="13"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" FontWeight="Bold" Padding="0 0 0 6">Localization Tag Components:</TextBlock>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center">AutoLOC:</TextBlock>
+            <TextBox Grid.Row="1" Grid.Column="2" Margin="2" Name="tagAutoLocPortion" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=Settings.ProjectSettings.TagAutoLocPortion, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Padding="8,0,0,0">Project:</TextBlock>
+            <TextBox Grid.Row="2" Grid.Column="2" Margin="2" Name="tagProjectPortion" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=Settings.ProjectSettings.TagProjectPortion, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+
+            <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" FontWeight="Bold" Padding="0 6 0 6">Localization ID Numbers:</TextBlock>
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center">ID Type:</TextBlock>
+            <ComboBox Grid.Row="4" Grid.Column="2" Margin="2" Name="idOptionsCombo" SelectionChanged="TagComboChanged" SelectedValue="{Binding Path=Settings.ProjectSettings.IDType, Mode=TwoWay}" ItemsSource="{Binding Path=Settings.ProjectSettings.IDTypes}" >
+            </ComboBox>
+
+            <TextBlock Grid.Row="5" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center" >Next Project ID:</TextBlock>
+            <TextBox Grid.Row="5" Grid.Column="2" Margin="2" Name="tagProjectID" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=Settings.ProjectSettings.NextProjectID, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+
+            <TextBlock Grid.Row="6" Grid.Column="0" Padding="8,0,0,0">Next User ID:</TextBlock>
+            <TextBox Grid.Row="6" Grid.Column="2" Margin="2" Name="tagUserID" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=Settings.UserSettings.NextUserID, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+
+            <StackPanel  Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Padding="0,0,5,0" FontStyle="Italic">Next Tag Format:</TextBlock>
+                <TextBlock Name="tagFormatExample" FontStyle="Italic" Text="{Binding Path=Settings.NextTag}"></TextBlock>
+            </StackPanel>
+
+        </Grid>
+
+        <StackPanel  Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <TextBlock Padding="0,0,5,0">KSP Assemblies: </TextBlock>
+            <TextBlock Name="kspDetectedText" Width="80">Not Detected</TextBlock>
+        </StackPanel>
+
+    <!--<StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Horizontal">
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Margin="5"  Width="100">KSP Assembly:</TextBlock>
+                <TextBlock Margin="5" >Not Detacted</TextBlock>
+            </StackPanel>
+            <TextBlock Margin="10" HorizontalAlignment="Center">SettingsWindow</TextBlock>
+            <Button Content="Click me!" Click="button1_Click" Width="120" Height="80" Name="button1"/>
+        </StackPanel>-->
+    </Grid>
+</UserControl>
