@@ -12,11 +12,18 @@ namespace KSPExtensions.Settings
         public LocalizerProjectSettings ProjectSettings { get; set; }
         public LocalizerUserSettings UserSettings { get; set; }
 
-        public LocalizerSettings()
+        public LocalizerSettings(string projectName)
         {
-            ProjectSettings = new LocalizerProjectSettings();
+            ProjectSettings = new LocalizerProjectSettings(projectName);
             UserSettings = new LocalizerUserSettings();
         }
+
+        public void WriteAllXML(string projectPath)
+        {
+            ProjectSettings.WriteXML(projectPath + "/.ksplocalizer.settings");
+            UserSettings.WriteXML(projectPath + "/.ksplocalizer.settings.user");
+        }
+
         public string NextTag { get {
                 string returnValue = "";
 

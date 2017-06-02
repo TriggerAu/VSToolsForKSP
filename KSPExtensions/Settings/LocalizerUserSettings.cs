@@ -10,6 +10,11 @@ namespace KSPExtensions.Settings
     public class LocalizerUserSettings : BaseSettings
     {
         public int NextUserID { get; set; }
+
+        public LocalizerUserSettings()
+        {
+            NextUserID = 600000;
+        }
     }
     
 }

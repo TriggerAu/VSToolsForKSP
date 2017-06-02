@@ -15,6 +15,18 @@ namespace KSPExtensions.Settings
 
         public int NextProjectID { get; set; }
 
+        public LocalizerProjectSettings()
+        {
+            TagAutoLocPortion = "#autoLOC";
+            TagProjectPortion = "";
+            IDType = IDTypeEnum.ProjectBased;
+            NextProjectID = 1000000;
+        }
+        public LocalizerProjectSettings(string projectName) : this()
+        {
+            TagProjectPortion = projectName;
+        }
+
         public enum IDTypeEnum
         {
             ProjectBased,

@@ -25,59 +25,73 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Grid.Column="0" FontWeight="Bold" VerticalAlignment="Center">Selected Project:</TextBlock>
-            <ComboBox Grid.Row="0" Grid.Column="2" Margin="2" Name="projectsList" SelectionChanged="TagComboChanged" Text="Project Based" >
-                <ComboBoxItem IsSelected="True">None</ComboBoxItem>
-            </ComboBox>
+            <ComboBox Grid.Row="0" Grid.Column="2" Margin="2" Name="projectsList" SelectionChanged="ProjectsComboChanged"></ComboBox>
         </Grid>
-        <Grid Grid.Row="1" Margin="10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="13"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" FontWeight="Bold" Padding="0 0 0 6">Localization Tag Components:</TextBlock>
+        <TabControl Name="Settingstabs" Grid.Row="1" Margin="10" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource VsBrush.WindowText}">
+            <TabItem Name="tabNoProject" Header="No Project" Foreground="{DynamicResource VsBrush.WindowText}">
+                <TextBlock>No Loaded projects detected</TextBlock>
+            </TabItem>
+            <TabItem Name="tabNoSettings" Header="No Settings" Foreground="{DynamicResource VsBrush.WindowText}">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock>The selected project has no settings file</TextBlock>
+                    <TextBlock></TextBlock>
+                    <Button Name="CreateSettings" Click="CreateSettings_Click">Create Localizer Settings Files</Button>
+                </StackPanel>
+            </TabItem>
+            <TabItem Name="tabSettings" Header="Settings"  Foreground="{DynamicResource VsBrush.WindowText}">
+                <Grid Margin="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="13"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" FontWeight="Bold" Padding="0 0 0 6">Localization Tag Components:</TextBlock>
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center">AutoLOC:</TextBlock>
-            <TextBox Grid.Row="1" Grid.Column="2" Margin="2" Name="tagAutoLocPortion" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=Settings.ProjectSettings.TagAutoLocPortion, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center">AutoLOC:</TextBlock>
+                    <TextBox Grid.Row="1" Grid.Column="2" Margin="2" Name="tagAutoLocPortion" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=Settings.ProjectSettings.TagAutoLocPortion, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}"></TextBox>
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Padding="8,0,0,0">Project:</TextBlock>
-            <TextBox Grid.Row="2" Grid.Column="2" Margin="2" Name="tagProjectPortion" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=Settings.ProjectSettings.TagProjectPortion, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Padding="8,0,0,0">Project:</TextBlock>
+                    <TextBox Grid.Row="2" Grid.Column="2" Margin="2" Name="tagProjectPortion" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=Settings.ProjectSettings.TagProjectPortion, UpdateSourceTrigger=PropertyChanged}"></TextBox>
 
-            <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" FontWeight="Bold" Padding="0 6 0 6">Localization ID Numbers:</TextBlock>
+                    <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" FontWeight="Bold" Padding="0 6 0 6">Localization ID Numbers:</TextBlock>
 
-            <TextBlock Grid.Row="4" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center">ID Type:</TextBlock>
-            <ComboBox Grid.Row="4" Grid.Column="2" Margin="2" Name="idOptionsCombo" SelectionChanged="TagComboChanged" SelectedValue="{Binding Path=Settings.ProjectSettings.IDType, Mode=TwoWay}" ItemsSource="{Binding Path=Settings.ProjectSettings.IDTypes}" >
-            </ComboBox>
+                    <TextBlock Grid.Row="4" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center">ID Type:</TextBlock>
+                    <ComboBox Grid.Row="4" Grid.Column="2" Margin="2" Name="idOptionsCombo" SelectionChanged="TagComboChanged" SelectedValue="{Binding Path=Settings.ProjectSettings.IDType, Mode=TwoWay}" ItemsSource="{Binding Path=Settings.ProjectSettings.IDTypes}" >
+                    </ComboBox>
 
-            <TextBlock Grid.Row="5" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center" >Next Project ID:</TextBlock>
-            <TextBox Grid.Row="5" Grid.Column="2" Margin="2" Name="tagProjectID" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=Settings.ProjectSettings.NextProjectID, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                    <TextBlock Grid.Row="5" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center" >Next Project ID:</TextBlock>
+                    <TextBox Grid.Row="5" Grid.Column="2" Margin="2" Name="tagProjectID" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=Settings.ProjectSettings.NextProjectID, UpdateSourceTrigger=PropertyChanged}"></TextBox>
 
-            <TextBlock Grid.Row="6" Grid.Column="0" Padding="8,0,0,0">Next User ID:</TextBlock>
-            <TextBox Grid.Row="6" Grid.Column="2" Margin="2" Name="tagUserID" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=Settings.UserSettings.NextUserID, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                    <TextBlock Grid.Row="6" Grid.Column="0" Padding="8,0,0,0">Next User ID:</TextBlock>
+                    <TextBox Grid.Row="6" Grid.Column="2" Margin="2" Name="tagUserID" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=Settings.UserSettings.NextUserID, UpdateSourceTrigger=PropertyChanged}"></TextBox>
 
-            <StackPanel  Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock Padding="0,0,5,0" FontStyle="Italic">Next Tag Format:</TextBlock>
-                <TextBlock Name="tagFormatExample" FontStyle="Italic" Text="{Binding Path=Settings.NextTag}"></TextBlock>
-            </StackPanel>
+                    <StackPanel  Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <TextBlock Padding="0,0,5,0" FontStyle="Italic">Next Tag Format:</TextBlock>
+                        <TextBlock Name="tagFormatExample" FontStyle="Italic" Text="{Binding Path=Settings.NextTag}"></TextBlock>
+                    </StackPanel>
 
-        </Grid>
+                </Grid>
+            </TabItem>
+        </TabControl>
 
-        <StackPanel  Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <TextBlock Padding="0,0,5,0">KSP Assemblies: </TextBlock>
+
+
+        <StackPanel Name="Footer" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <TextBlock Padding="0,0,5,0">KSP Assemblies:</TextBlock>
             <TextBlock Name="kspDetectedText" Width="80">Not Detected</TextBlock>
         </StackPanel>
 
-    <!--<StackPanel Orientation="Vertical">
+        <!--<StackPanel Orientation="Vertical">
             <StackPanel Orientation="Horizontal">
             </StackPanel>
             <StackPanel Orientation="Horizontal">
