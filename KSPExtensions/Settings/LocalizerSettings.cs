@@ -40,6 +40,14 @@ namespace KSPExtensions.Settings
                     returnValue += UserSettings.NextUserID;
                 }
                 return returnValue;
-            } }
+            }
+        }
+        public LocalizerProjectSettings.IDTypeEnum IDType
+        {
+            get
+            {
+                return ProjectSettings.IDType;
+            }
+        }
     }
 }

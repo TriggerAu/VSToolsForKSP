@@ -21,9 +21,7 @@ namespace KSPExtensions.ToolWindows
     /// </summary>
     public partial class LocalizerSettingsWindowControl : UserControl
     {
-
-        public LocalizerSettings Settings { get; set; }
-        private ProjectDetails currentProject;
+        public ProjectDetails CurrentProject { get; set; }
         /// <summary>
         /// Initializes a new instance of the <see cref="LocalizerSettingsWindowControl"/> class.
         /// </summary>
@@ -31,24 +29,15 @@ namespace KSPExtensions.ToolWindows
         {
             this.InitializeComponent();
 
-            ProjectsManager.ProjectsListChanged += ExtensionUtils_ProjectsListChanged;
-
-            Settings = null;
-            currentProject = null;
-
-            Settings = new LocalizerSettings("");
-            Settings.ProjectSettings.IDType = LocalizerProjectSettings.IDTypeEnum.ProjectBased;
-            Settings.ProjectSettings.NextProjectID = 100000;
-            Settings.ProjectSettings.TagAutoLocPortion = "#autoLOC";
-            Settings.ProjectSettings.WriteXML("c:\\users\\dtregoning\\desktop\\test.xml");
-
-            //Settings.ProjectSettings = LocalizerProjectSettings.CreateFromXML<LocalizerProjectSettings>("c:\\users\\dtregoning\\desktop\\test.xml");
-            this.DataContext = this;
-
+            //Hide the tab header - only use this in designer
             Style s = new Style();
             s.Setters.Add(new Setter(UIElement.VisibilityProperty, Visibility.Collapsed));
             Settingstabs.ItemContainerStyle = s;
-            
+
+
+            ProjectsManager.ProjectsListChanged += ExtensionUtils_ProjectsListChanged;
+            CurrentProject = null;
+
             UpdateProjectsDropdown();
         }
 
@@ -64,7 +53,7 @@ namespace KSPExtensions.ToolWindows
             if (projectsList.Items.Count > 0)
             {
                 projectsList.IsEnabled = true;
-                currentProject = ProjectsManager.projects[projectsList.Items[0].ToString()];
+                CurrentProject = ProjectsManager.projects[projectsList.Items[0].ToString()];
             }
             else
             {
@@ -79,26 +68,21 @@ namespace KSPExtensions.ToolWindows
                 projectsList.IsEnabled = false;
                 Settingstabs.SelectedItem = tabNoProject;
 
-                currentProject = null;
+                CurrentProject = null;
             }
             projectsList.SelectedItem = projectsList.Items[0];
         }
 
         private void ProjectsComboChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (currentProject == null)
+            if (CurrentProject == null)
                 return;
 
-            //Now check we have the two files
-            if(File.Exists(currentProject.FolderPath + "/.ksplocalizer.settings") && File.Exists(currentProject.FolderPath + "/.ksplocalizer.settings"))
+            if (CurrentProject.HasLocalizerSettings)
             {
-                Settings = new LocalizerSettings(currentProject.name);
-                Settings.ProjectSettings = LocalizerSettings.CreateFromXML<LocalizerProjectSettings>(currentProject.FolderPath + "/.ksplocalizer.settings");
-                Settings.UserSettings = LocalizerSettings.CreateFromXML<LocalizerUserSettings>(currentProject.FolderPath + "/.ksplocalizer.settings.user");
-
-                //reset these two
-                this.DataContext = this;
-                tagProjectPortion.Text = Settings.ProjectSettings.TagProjectPortion;
+                //load the text boxes
+                this.DataContext = this.CurrentProject;
+                //tagProjectPortion.Text = CurrentProject.localizerSettings.ProjectSettings.TagProjectPortion;
 
                 Settingstabs.SelectedItem = tabSettings;
 
@@ -124,36 +108,22 @@ namespace KSPExtensions.ToolWindows
 
         private void TagComboChanged(object sender, SelectionChangedEventArgs e)
         {
-            Settings.ProjectSettings.IDType = (LocalizerProjectSettings.IDTypeEnum)idOptionsCombo.SelectedValue;
+            CurrentProject.LocalizerSettings.ProjectSettings.IDType = (LocalizerProjectSettings.IDTypeEnum)idOptionsCombo.SelectedValue;
             UpdateSampleText();
         }
 
         private void UpdateSampleText(bool dontSaveChanges = false)
         {
-            if (currentProject== null || tagFormatExample == null)
+            if (CurrentProject== null || tagFormatExample == null)
                 return;
 
             BindingExpression b = tagFormatExample.GetBindingExpression(TextBlock.TextProperty);
                 
             if(b!=null) b.UpdateTarget();
 
-            //tagFormatExample.Text = tagAutoLocPortion.Text + "_";
-            //if (tagProjectPortion.Text != "")
-            //    tagFormatExample.Text += tagProjectPortion.Text + "_";
-
-            //if ((idOptionsCombo.SelectedItem as ComboBoxItem).Content.ToString() == "Project Based")
-            //{
-            //    tagFormatExample.Text += tagProjectID.Text;
-            //}
-            //else
-            //{
-            //    tagFormatExample.Text += tagUserID.Text;
-            //}
-            //Settings.WriteXML(ProjectsManager.projects[projectsList.SelectedValue.ToString()].FolderPath + "/KSPExtensionsLocalizer.settings");
-
             if (!dontSaveChanges)
             {
-                Settings.WriteAllXML(currentProject.FolderPath);
+                CurrentProject.LocalizerSettings.WriteAllXML(CurrentProject.FolderPath);
             }
         }
 
@@ -164,8 +134,8 @@ namespace KSPExtensions.ToolWindows
 
         private void CreateSettings_Click(object sender, RoutedEventArgs e)
         {
-            Settings = new LocalizerSettings(currentProject.name);
-            Settings.WriteAllXML(currentProject.FolderPath);
+            CurrentProject.LocalizerSettings = new LocalizerSettings(CurrentProject.name);
+            CurrentProject.LocalizerSettings.WriteAllXML(CurrentProject.FolderPath);
             UpdateProjectsDropdown();
         }
     }
