@@ -15,6 +15,7 @@ namespace KSPExtensions.ToolWindows
     using System.Windows.Data;
     using System.Windows.Media;
     using System.IO;
+    using Microsoft.Win32;
 
     /// <summary>
     /// Interaction logic for LocalizerSettingsWindowControl.
@@ -45,7 +46,7 @@ namespace KSPExtensions.ToolWindows
 
         private void LocalizerFormatRefactoring_OnRefactorComplete()
         {
-            this.DataContext = this;
+
         }
 
         private void UpdateProjectsDropdown()
@@ -146,6 +147,19 @@ namespace KSPExtensions.ToolWindows
             CurrentProject.LocalizerSettings = new LocalizerSettings(CurrentProject.name);
             CurrentProject.LocalizerSettings.WriteAllXML(CurrentProject.FolderPath);
             UpdateProjectsDropdown();
+        }
+
+        private void BaseFileSelector_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog dlg = new SaveFileDialog();
+            dlg.FileName = BaseFile.Text;
+            dlg.DefaultExt = ".cfg";
+            dlg.Filter = "Config Files (*.cfg)|*.cfg|All Files (*.*)|*.*";
+
+            if (dlg.ShowDialog()==true)
+            {
+                BaseFile.Text = dlg.FileName;
+            }
         }
     }
 }

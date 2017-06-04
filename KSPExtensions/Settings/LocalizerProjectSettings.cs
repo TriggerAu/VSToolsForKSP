@@ -15,12 +15,15 @@ namespace KSPExtensions.Settings
 
         public int NextProjectID { get; set; }
 
+        public string BaseCfgFile { get; set; }
+
         public LocalizerProjectSettings()
         {
             TagAutoLocPortion = "#autoLOC";
             TagProjectPortion = "";
             IDType = IDTypeEnum.ProjectBased;
             NextProjectID = 1000000;
+            BaseCfgFile = "refactor.cfg";
         }
         public LocalizerProjectSettings(string projectName) : this()
         {

@@ -7,7 +7,7 @@
              Background="{DynamicResource VsBrush.Window}"
              Foreground="{DynamicResource VsBrush.WindowText}"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300"
+             d:DesignHeight="425.333" d:DesignWidth="300"
              Name="MyToolWindow">
     <Grid>
         <Grid.RowDefinitions>
@@ -55,11 +55,14 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
+
                     <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" FontWeight="Bold" Padding="0 0 0 6">Localization Tag Components:</TextBlock>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center">AutoLOC:</TextBlock>
-                    <TextBox Grid.Row="1" Grid.Column="2" Margin="2" Name="tagAutoLocPortion" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=LocalizerSettings.ProjectSettings.TagAutoLocPortion, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay,diag:PresentationTraceSources.TraceLevel=High}"></TextBox>
+                    <TextBox Grid.Row="1" Grid.Column="2" Margin="2" Name="tagAutoLocPortion" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=LocalizerSettings.ProjectSettings.TagAutoLocPortion, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}"></TextBox>
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Padding="8,0,0,0">Project:</TextBlock>
                     <TextBox Grid.Row="2" Grid.Column="2" Margin="2" Name="tagProjectPortion" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=LocalizerSettings.ProjectSettings.TagProjectPortion, UpdateSourceTrigger=PropertyChanged}"></TextBox>
@@ -76,10 +79,23 @@
                     <TextBlock Grid.Row="6" Grid.Column="0" Padding="8,0,0,0">Next User ID:</TextBlock>
                     <TextBox Grid.Row="6" Grid.Column="2" Margin="2" Name="tagUserID" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=LocalizerSettings.UserSettings.NextUserID, UpdateSourceTrigger=PropertyChanged}"></TextBox>
 
-                    <StackPanel  Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <StackPanel  Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
                         <TextBlock Padding="0,0,5,0" FontStyle="Italic">Next Tag Format:</TextBlock>
                         <TextBlock Name="tagFormatExample" FontStyle="Italic" Text="{Binding Path=LocalizerSettings.NextTag}"></TextBlock>
                     </StackPanel>
+
+                    <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3" FontWeight="Bold" Padding="0 6 0 6">File Components:</TextBlock>
+
+                    <TextBlock Grid.Row="9" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center">Base cfg file:</TextBlock>
+                    <Grid Grid.Row="10" Grid.Column="2" Margin="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="24"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Name="BaseFile"  KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=LocalizerSettings.ProjectSettings.BaseCfgFile, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}"></TextBox>
+                        <Button Grid.Column="1" Name="BaseFileSelector" Click="BaseFileSelector_Click">F</Button>
+                    </Grid>
+
 
                 </Grid>
             </TabItem>

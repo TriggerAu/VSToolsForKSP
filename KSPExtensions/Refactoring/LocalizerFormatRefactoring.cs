@@ -12,6 +12,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Rename;
 using Microsoft.CodeAnalysis.Text;
+using System.IO;
+using System.Text;
 
 namespace KSPExtensions.Refactoring
 {
@@ -23,6 +25,8 @@ namespace KSPExtensions.Refactoring
             //If the documents project has no localizer settings dont give the option
             if (!ProjectsManager.ProjectHasLocalizerSettings(context.Document.Project.Name))
                 return;
+
+            //Need to make sure a file is configured before here too!!!!
 
             //Get the doc we need to work with
             var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
@@ -55,11 +59,17 @@ namespace KSPExtensions.Refactoring
         private ProjectDetails currentProject;
 
 
+        private string newIDKey="";
+        private string newValue = "";
         private async Task<Document> ReplaceStringWithLocalizerFormat(Document document, LiteralExpressionSyntax litDecl, CancellationToken cancellationToken)
         {
             //Get the details of the ID to use
             currentProject = ProjectsManager.projects[document.Project.Name];
-            string newIDKey = currentProject.LocalizerSettings.NextTag;
+            newIDKey = currentProject.LocalizerSettings.NextTag;
+            newValue = litDecl.ToString();
+
+            if (newValue.StartsWith("\"")) newValue = newValue.Substring(1);
+            if (newValue.EndsWith("\"")) newValue = newValue.Substring(0,newValue.Length-1);
 
             var root = await document.GetSyntaxRootAsync(cancellationToken);
             var newroot = (CompilationUnitSyntax)root;
@@ -105,7 +115,18 @@ namespace KSPExtensions.Refactoring
         {
             //if this fires then we changed the actual file
             //Write the value to the cfg files...
+            string cfgFile = currentProject.LocalizerSettings.ProjectSettings.BaseCfgFile;
+            if (!File.Exists(cfgFile))
+            {
+                File.WriteAllText(cfgFile, "Localization\n{\n\ten-us\n\t{\n\t}\n}\n", Encoding.UTF8);
+            }
 
+            List<string> fileLinesFile = File.ReadAllLines(cfgFile, Encoding.UTF8).ToList();
+            fileLinesFile.Insert(
+                    fileLinesFile.Count - 2,
+                    string.Format("\t\t{0} = {1}", newIDKey, newValue)
+                );
+            File.WriteAllLines(cfgFile, fileLinesFile.ToArray(), Encoding.UTF8);
 
 
             //update the settings...
