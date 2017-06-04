@@ -12,13 +12,11 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Rename;
 using Microsoft.CodeAnalysis.Text;
-using Microsoft.VisualStudio.Shell.Interop;
 
 namespace KSPExtensions.Refactoring
 {
     [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(LocalizerFormatRefactoring)), Shared]
-    [Export(typeof(IVsHierarchyRefactorNotify))]
-    internal class LocalizerFormatRefactoring : CodeRefactoringProvider,  Microsoft.VisualStudio.Shell.Interop.IVsHierarchyRefactorNotify
+    internal class LocalizerFormatRefactoring : CodeRefactoringProvider
     {
         public sealed override async Task ComputeRefactoringsAsync(CodeRefactoringContext context)
         {
@@ -106,48 +104,6 @@ namespace KSPExtensions.Refactoring
             }
 
             return null;
-        }
-
-
-
-        public int OnBeforeGlobalSymbolRenamed(uint cItemsAffected, uint[] rgItemsAffected, uint cRQNames, string[] rglpszRQName, string lpszNewName, int promptContinueOnFail)
-        {
-            return 1;
-        }
-
-        public int OnGlobalSymbolRenamed(uint cItemsAffected, uint[] rgItemsAffected, uint cRQNames, string[] rglpszRQName, string lpszNewName)
-        {
-                        return 1;
-        }
-
-        public int OnBeforeReorderParams(uint itemid, string lpszRQName, uint cParamIndexes, uint[] rgParamIndexes, int promptContinueOnFail)
-        {
-                        return 1;
-        }
-
-        public int OnReorderParams(uint itemid, string lpszRQName, uint cParamIndexes, uint[] rgParamIndexes)
-        {
-                        return 1;
-        }
-
-        public int OnBeforeRemoveParams(uint itemid, string lpszRQName, uint cParamIndexes, uint[] rgParamIndexes, int promptContinueOnFail)
-        {
-                        return 1;
-        }
-
-        public int OnRemoveParams(uint itemid, string lpszRQName, uint cParamIndexes, uint[] rgParamIndexes)
-        {
-                        return 1;
-        }
-
-        public int OnBeforeAddParams(uint itemid, string lpszRQName, uint cParams, uint[] rgszParamIndexes, string[] rgszRQTypeNames, string[] rgszParamNames, int promptContinueOnFail)
-        {
-                        return 1;
-        }
-
-        public int OnAddParams(uint itemid, string lpszRQName, uint cParams, uint[] rgszParamIndexes, string[] rgszRQTypeNames, string[] rgszParamNames)
-        {
-                        return 1;
         }
     }
 }
