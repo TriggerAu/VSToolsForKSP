@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using System.Threading;
 
-namespace KSPExtensions
+namespace KSPExtensions.Refactoring
 {
     /// <summary>
     /// This class is an overridden CodeAction so we can detect when a change actually occured and then process items on that event
@@ -115,12 +115,18 @@ namespace KSPExtensions
         protected override Task<Document> GetChangedDocumentAsync(CancellationToken cancellationToken)
         {
             //System.Diagnostics.Debug.WriteLine("Changed:{0}", HasPreviewed);
-            return createChangedDocument(cancellationToken);
+            if (createChangedDocument == null)
+                return base.GetChangedDocumentAsync(cancellationToken);
+            else
+                return createChangedDocument(cancellationToken);
         }
 
         protected override Task<Solution> GetChangedSolutionAsync(CancellationToken cancellationToken)
         {
-            return createChangedSolution(cancellationToken);
+            if (createChangedSolution == null)
+                return base.GetChangedSolutionAsync(cancellationToken);
+            else 
+                return createChangedSolution(cancellationToken);
         }
         #endregion
     }

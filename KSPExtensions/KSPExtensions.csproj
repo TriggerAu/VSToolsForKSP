@@ -55,7 +55,7 @@
     <Compile Include="ProjectsManager\ProjectDetails.cs" />
     <Compile Include="ProjectsManager\ProjectsManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Refactoring\CodeActionBetterer.cs" />
+    <Compile Include="Refactoring\RefactoringCodeAction.cs" />
     <Compile Include="Refactoring\LocalizerFormatRefactoring.cs" />
     <Compile Include="Settings\BaseSettings.cs" />
     <Compile Include="Settings\LocalizerSettings.cs" />

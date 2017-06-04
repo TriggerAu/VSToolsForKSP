@@ -120,6 +120,11 @@ namespace KSPExtensions.Refactoring
 
             // and rewrite the xmls
             currentProject.LocalizerSettings.WriteAllXML(currentProject.FolderPath);
+
+            OnRefactorComplete?.Invoke();
         }
+
+        public delegate void RefactorComplete();
+        public static event RefactorComplete OnRefactorComplete;
     }
 }

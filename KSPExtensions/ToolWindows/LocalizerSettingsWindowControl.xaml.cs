@@ -39,6 +39,13 @@ namespace KSPExtensions.ToolWindows
             CurrentProject = null;
 
             UpdateProjectsDropdown();
+
+            KSPExtensions.Refactoring.LocalizerFormatRefactoring.OnRefactorComplete += LocalizerFormatRefactoring_OnRefactorComplete;
+        }
+
+        private void LocalizerFormatRefactoring_OnRefactorComplete()
+        {
+            this.DataContext = this;
         }
 
         private void UpdateProjectsDropdown()
@@ -75,8 +82,10 @@ namespace KSPExtensions.ToolWindows
 
         private void ProjectsComboChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (CurrentProject == null)
+            if(ProjectsManager.projects.Count < 1 || projectsList.SelectedValue == null)
                 return;
+
+            CurrentProject = ProjectsManager.projects[projectsList.SelectedValue.ToString()];
 
             if (CurrentProject.HasLocalizerSettings)
             {
