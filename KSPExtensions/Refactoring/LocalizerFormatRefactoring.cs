@@ -44,18 +44,22 @@ namespace KSPExtensions.Refactoring
             }
 
             // Create the action if we are all good
-            var action = CodeAction.Create("Replace String with KSP Localizer.Format", c => ReplaceStringWithLocalizerFormat(context.Document, typeDecl, c));
+            var action = RefactoringCodeAction.Create("Replace String with KSP Localizer.Format", c => ReplaceStringWithLocalizerFormat(context.Document, typeDecl, c));
+
+            action.OnChangesWithNoPreview += Action_OnDocumentChanged;
 
             // Register this code action.
             context.RegisterRefactoring(action);
         }
 
-        private static string cfgFile = "localization.cfg";
+        private ProjectDetails currentProject;
+
+
         private async Task<Document> ReplaceStringWithLocalizerFormat(Document document, LiteralExpressionSyntax litDecl, CancellationToken cancellationToken)
         {
             //Get the details of the ID to use
-            ProjectDetails p = ProjectsManager.projects[document.Project.Name];
-            string newIDKey = p.LocalizerSettings.NextTag;
+            currentProject = ProjectsManager.projects[document.Project.Name];
+            string newIDKey = currentProject.LocalizerSettings.NextTag;
 
             var root = await document.GetSyntaxRootAsync(cancellationToken);
             var newroot = (CompilationUnitSyntax)root;
@@ -87,23 +91,35 @@ namespace KSPExtensions.Refactoring
 
                 var result = document.WithSyntaxRoot(newroot);
 
-                //if (p.LocalizerSettings.IDType == Settings.LocalizerProjectSettings.IDTypeEnum.ProjectBased)
-                //{
-                //    p.LocalizerSettings.ProjectSettings.NextProjectID++;
-                //} else
-                //{
-                //    p.LocalizerSettings.UserSettings.NextUserID++;
-                //}
-                //p.LocalizerSettings.WriteAllXML(p.FolderPath);
-
                 return result;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("AAA:" + ex.Message);
+                System.Diagnostics.Debug.WriteLine("[LocalizerFormatRefactoring]: Failed in refactoring - " + ex.Message);
             }
 
             return null;
+        }
+
+        private void Action_OnDocumentChanged()
+        {
+            //if this fires then we changed the actual file
+            //Write the value to the cfg files...
+
+
+
+            //update the settings...
+            if (currentProject.LocalizerSettings.IDType == Settings.LocalizerProjectSettings.IDTypeEnum.ProjectBased)
+            {
+                currentProject.LocalizerSettings.ProjectSettings.NextProjectID++;
+            }
+            else
+            {
+                currentProject.LocalizerSettings.UserSettings.NextUserID++;
+            }
+
+            // and rewrite the xmls
+            currentProject.LocalizerSettings.WriteAllXML(currentProject.FolderPath);
         }
     }
 }
