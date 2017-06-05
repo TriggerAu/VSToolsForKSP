@@ -71,7 +71,42 @@ namespace KSPExtensions.Refactoring
             if (newValue.StartsWith("\"")) newValue = newValue.Substring(1);
             if (newValue.EndsWith("\"")) newValue = newValue.Substring(0,newValue.Length-1);
 
+            //Get the document
             var root = await document.GetSyntaxRootAsync(cancellationToken);
+
+            //find the Trivial that marks the end of this line
+            bool foundEOL = false;
+            SyntaxNode objToCheck = litDecl;
+            SyntaxTrivia objEOL = SyntaxFactory.Comment(" ");
+            while (!foundEOL)
+            {
+                objToCheck = objToCheck.Parent;
+
+                if (objToCheck.ChildNodesAndTokens().Last().HasTrailingTrivia)
+                {
+                    foreach (SyntaxTrivia item in objToCheck.ChildNodesAndTokens().Last().GetTrailingTrivia())
+                    {
+                        if(item.Kind() == SyntaxKind.EndOfLineTrivia)
+                        {
+                            foundEOL = true;
+                            objEOL = item;
+                            break;
+                        }
+                    }
+                }
+                if(objToCheck == root)
+                {
+                    break;
+                }
+            }
+
+            var tabs = SyntaxFactory.Whitespace("\t\t");
+            var comment = SyntaxFactory.Comment(newIDKey + " = " + newValue);
+            List<SyntaxTrivia> lineComment = new List<SyntaxTrivia>();
+            lineComment.Add(tabs);
+            lineComment.Add(comment);
+
+
             var newroot = (CompilationUnitSyntax)root;
 
             //Set up the call to Localizer.Format
@@ -92,11 +127,11 @@ namespace KSPExtensions.Refactoring
             {
                 if (newroot.Usings.Any(u => u.Name.GetText().ToString() == "KSP.Localization"))
                 {
-                    newroot = newroot.ReplaceNode(litDecl, (SyntaxNode)writecall);
+                    newroot = newroot.ReplaceNode(litDecl, (SyntaxNode)writecall).InsertTriviaBefore(objEOL,lineComment);
                 }
                 else
                 {
-                    newroot = newroot.ReplaceNode(litDecl, (SyntaxNode)writecall).AddUsings(SyntaxFactory.UsingDirective(SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName("KSP"), SyntaxFactory.IdentifierName("Localization"))));
+                    newroot = newroot.ReplaceNode(litDecl, (SyntaxNode)writecall).InsertTriviaBefore(objEOL, lineComment).AddUsings(SyntaxFactory.UsingDirective(SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName("KSP"), SyntaxFactory.IdentifierName("Localization"))));
                 }
 
                 var result = document.WithSyntaxRoot(newroot);
