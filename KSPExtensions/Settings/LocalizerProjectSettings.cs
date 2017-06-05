@@ -9,13 +9,36 @@ namespace KSPExtensions.Settings
 {
     public class LocalizerProjectSettings : BaseSettings
     {
-        public string TagAutoLocPortion { get; set; }
-        public string TagProjectPortion { get; set; }
-        public IDTypeEnum IDType { get; set; }
+        private string tagAutoLocPortion;
+        public string TagAutoLocPortion
+        {
+            get { return tagAutoLocPortion; }
+            set { Set(ref tagAutoLocPortion, value); }
+        }
+        private string tagProjectPortion;
+        public string TagProjectPortion
+        {
+            get { return tagProjectPortion; }
+            set { Set(ref tagProjectPortion, value); }
+        }
+        private IDTypeEnum idType;
+        public IDTypeEnum IDType
+        {
+            get { return idType; }
+            set { Set(ref idType, value); }
+        }
 
-        public int NextProjectID { get; set; }
+        private int nextProjectId;
+        public int NextProjectID {
+            get { return nextProjectId; }
+            set { Set(ref nextProjectId, value); }
+        }
 
-        public string BaseCfgFile { get; set; }
+        private string baseCfgFile;
+        public string BaseCfgFile {
+            get { return baseCfgFile; }
+            set { Set(ref baseCfgFile, value); }
+        }
 
         public LocalizerProjectSettings()
         {

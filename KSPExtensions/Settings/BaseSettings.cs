@@ -8,7 +8,7 @@ using System.Xml.Serialization;
 
 namespace KSPExtensions.Settings
 {
-    public class BaseSettings
+    public class BaseSettings : BindableBase
     {
         public void WriteXML(string filePath)
         {

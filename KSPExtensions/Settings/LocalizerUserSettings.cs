@@ -9,7 +9,12 @@ namespace KSPExtensions.Settings
 {
     public class LocalizerUserSettings : BaseSettings
     {
-        public int NextUserID { get; set; }
+        private int nextUserID;
+        public int NextUserID
+        {
+            get { return nextUserID; }
+            set { Set(ref nextUserID, value); }
+        }
 
         public LocalizerUserSettings()
         {
