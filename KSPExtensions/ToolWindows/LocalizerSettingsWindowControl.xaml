@@ -57,6 +57,9 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" FontWeight="Bold" Padding="0 0 0 6">Localization Tag Components:</TextBlock>
@@ -64,7 +67,7 @@
                     <TextBlock Grid.Row="1" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center">AutoLOC:</TextBlock>
                     <TextBox Grid.Row="1" Grid.Column="2" Margin="2" Name="tagAutoLocPortion" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=LocalizerSettings.ProjectSettings.TagAutoLocPortion, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}"></TextBox>
 
-                    <TextBlock Grid.Row="2" Grid.Column="0" Padding="8,0,0,0">Project:</TextBlock>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center" >Project:</TextBlock>
                     <TextBox Grid.Row="2" Grid.Column="2" Margin="2" Name="tagProjectPortion" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=LocalizerSettings.ProjectSettings.TagProjectPortion, UpdateSourceTrigger=PropertyChanged}"></TextBox>
 
                     <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" FontWeight="Bold" Padding="0 6 0 6">Localization ID Numbers:</TextBlock>
@@ -76,7 +79,7 @@
                     <TextBlock Grid.Row="5" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center" >Next Project ID:</TextBlock>
                     <TextBox Grid.Row="5" Grid.Column="2" Margin="2" Name="tagProjectID" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=LocalizerSettings.ProjectSettings.NextProjectID, UpdateSourceTrigger=PropertyChanged,NotifyOnSourceUpdated=True,NotifyOnTargetUpdated=True}"></TextBox>
 
-                    <TextBlock Grid.Row="6" Grid.Column="0" Padding="8,0,0,0">Next User ID:</TextBlock>
+                    <TextBlock Grid.Row="6" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center" >Next User ID:</TextBlock>
                     <TextBox Grid.Row="6" Grid.Column="2" Margin="2" Name="tagUserID" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=LocalizerSettings.UserSettings.NextUserID, UpdateSourceTrigger=PropertyChanged}"></TextBox>
 
                     <StackPanel  Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
@@ -87,7 +90,7 @@
                     <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3" FontWeight="Bold" Padding="0 6 0 6">File Components:</TextBlock>
 
                     <TextBlock Grid.Row="9" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center">Base cfg file:</TextBlock>
-                    <Grid Grid.Row="10" Grid.Column="2" Margin="2">
+                    <Grid Grid.Row="9" Grid.Column="2" Margin="2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="24"/>
@@ -96,6 +99,28 @@
                         <Button Grid.Column="1" Name="BaseFileSelector" Click="BaseFileSelector_Click">F</Button>
                     </Grid>
 
+                    <TextBlock Grid.Row="10" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center" Text="Languages:">
+                        <TextBlock.ToolTip>
+                            <ToolTip>
+                                <TextBlock>Comma separated list of languag codes</TextBlock>
+                            </ToolTip>
+                        </TextBlock.ToolTip>
+                    </TextBlock>
+                    <TextBox Grid.Row="10" Grid.Column="2" Margin="2" Name="cfgLanguages" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=LocalizerSettings.ProjectSettings.LanguageCodes, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+
+                    <StackPanel Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal">
+                        <TextBlock Padding="8,3,0,3" VerticalAlignment="Center" >Store each language in a new file:</TextBlock>
+                        <CheckBox  Margin="8,0,0,0" VerticalAlignment="Center"  Name="cfgLanguageMultiFile" IsChecked="{Binding Path=LocalizerSettings.UserSettings.UseMultiCfgFiles, UpdateSourceTrigger=PropertyChanged}"></CheckBox>
+                    </StackPanel>
+
+                    <TextBlock Grid.Row="12" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center">Multi File Path:</TextBlock>
+                    <TextBox  Grid.Row="12" Grid.Column="2" Name="MultiFile"  KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=LocalizerSettings.ProjectSettings.MultiCfgFile, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}">
+                        <TextBox.ToolTip>
+                            <ToolTip>
+                                <TextBox>The path to the CFG Files - use {LANGCODE} to note where the language codes should be substituted</TextBox>
+                            </ToolTip>
+                        </TextBox.ToolTip>
+                    </TextBox>
 
                 </Grid>
             </TabItem>

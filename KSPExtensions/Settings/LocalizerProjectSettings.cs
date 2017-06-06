@@ -40,6 +40,29 @@ namespace KSPExtensions.Settings
             set { Set(ref baseCfgFile, value); }
         }
 
+        private string languageCodes;
+        public string LanguageCodes
+        {
+            get { return languageCodes; }
+            set { Set(ref languageCodes, value); }
+        }
+
+        private bool useMultiCFGFiles;
+
+        public bool UseMultiCfgFiles
+        {
+            get { return useMultiCFGFiles; }
+            set { Set(ref useMultiCFGFiles , value); }
+        }
+
+        private string multiCfgFile;
+        public string MultiCfgFile
+        {
+            get { return multiCfgFile; }
+            set { Set(ref multiCfgFile, value); }
+        }
+
+
         public LocalizerProjectSettings()
         {
             TagAutoLocPortion = "#autoLOC";
@@ -47,6 +70,9 @@ namespace KSPExtensions.Settings
             IDType = IDTypeEnum.ProjectBased;
             NextProjectID = 1000000;
             BaseCfgFile = "refactor.cfg";
+            LanguageCodes = "en-us,es-es,ja,ru,zh-cn";
+            UseMultiCfgFiles = false;
+            MultiCfgFile = "refactor_{LANGCODE}.cfg";
         }
         public LocalizerProjectSettings(string projectName) : this()
         {

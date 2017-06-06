@@ -208,19 +208,32 @@ namespace KSPExtensions.Refactoring
         {
             //if this fires then we changed the actual file
             //Write the value to the cfg files...
-            string cfgFile = currentProject.LocalizerSettings.ProjectSettings.BaseCfgFile;
-            if (!File.Exists(cfgFile))
+            string[] langCodes = currentProject.LocalizerSettings.ProjectSettings.LanguageCodes.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (string langCode in langCodes)
             {
-                File.WriteAllText(cfgFile, "Localization\n{\n\ten-us\n\t{\n\t}\n}\n", Encoding.UTF8);
+                string destinationFile = currentProject.LocalizerSettings.ProjectSettings.BaseCfgFile;
+                if (currentProject.LocalizerSettings.ProjectSettings.UseMultiCfgFiles)
+                {
+                    destinationFile = currentProject.LocalizerSettings.ProjectSettings.MultiCfgFile.Replace("{LANGCODE}", langCode);
+                }
+
+                AddTagToFile(newIDKey, newValue, langCode, destinationFile);
             }
 
-            List<string> fileLinesFile = File.ReadAllLines(cfgFile, Encoding.UTF8).ToList();
-            fileLinesFile.Insert(
-                    fileLinesFile.Count - 2,
-                    string.Format("\t\t{0} = {1}", newIDKey, newValue)
-                );
-            File.WriteAllLines(cfgFile, fileLinesFile.ToArray(), Encoding.UTF8);
+                
 
+            //string cfgFile = currentProject.LocalizerSettings.ProjectSettings.BaseCfgFile;
+            //if (!File.Exists(cfgFile))
+            //{
+            //    File.WriteAllText(cfgFile, "Localization\n{\n\ten-us\n\t{\n\t}\n}\n", Encoding.UTF8);
+            //}
+
+            //List<string> fileLinesFile = File.ReadAllLines(cfgFile, Encoding.UTF8).ToList();
+            //fileLinesFile.Insert(
+            //        fileLinesFile.Count - 2,
+            //        string.Format("\t\t{0} = {1}", newIDKey, newValue)
+            //    );
+            //File.WriteAllLines(cfgFile, fileLinesFile.ToArray(), Encoding.UTF8);
 
             //update the settings...
             if (currentProject.LocalizerSettings.IDType == Settings.LocalizerProjectSettings.IDTypeEnum.ProjectBased)
@@ -236,6 +249,81 @@ namespace KSPExtensions.Refactoring
             currentProject.LocalizerSettings.WriteAllXML(currentProject.FolderPath);
 
             OnRefactorComplete?.Invoke();
+        }
+
+        private void AddTagToFile(string key, string value, string LangCode, string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                File.WriteAllText(filePath, "Localization\n{\n\t" + LangCode + "\n\t{\n\t}\n}\n", Encoding.UTF8);
+            }
+
+            string[] oldLines = File.ReadAllLines(filePath);
+
+            List<string> newLines = new List<string>();
+
+            int cfgLevel = 0;
+            string NextCfgSection = "", CurrentCfgSection = "", CurrentSectionPath = "";
+            Stack<string> previousSectionStack = new Stack<string>();
+
+            bool AddedTag = false;
+            foreach (string line in oldLines)
+            {
+                //If we already added the tag then just buildthe rest of the file
+                if (AddedTag)
+                {
+                    newLines.Add(line);
+                    continue;
+                }
+
+                string[] pairs = line.Split(new char[] { '=' }, 2);
+                string lineKey = pairs[0].Trim();
+                if (lineKey == "{")
+                {
+                    cfgLevel++;
+                    previousSectionStack.Push(CurrentCfgSection);
+                    CurrentCfgSection = NextCfgSection;
+                    CurrentSectionPath += "/" + NextCfgSection;
+                    System.Diagnostics.Debug.WriteLine("Opening:{0}-{1}", cfgLevel, CurrentSectionPath);
+                }
+                else if (lineKey == "}")
+                {
+                    System.Diagnostics.Debug.WriteLine("Closing:{0}-{1}", cfgLevel, CurrentSectionPath);
+
+                    if (CurrentSectionPath == "/Localization/" + LangCode)
+                    {
+                        newLines.Add(string.Format("\t\t{0} = {1}", key, value));
+                        AddedTag = true;
+                    }
+                    else if (CurrentSectionPath == "/Localization" && AddedTag == false)
+                    {
+                        newLines.Add(string.Format("\t{0}", LangCode));
+                        newLines.Add(string.Format("\t{{"));
+                        newLines.Add(string.Format("\t\t{0} = {1}", key, value));
+                        newLines.Add(string.Format("\t}}"));
+                        AddedTag = true;
+                    }
+
+                    CurrentCfgSection = previousSectionStack.Pop();
+                    CurrentSectionPath = CurrentSectionPath.Substring(0, CurrentSectionPath.LastIndexOf("/"));
+                    cfgLevel--;
+                }
+                else if (pairs.Length < 2)
+                {
+                    NextCfgSection = lineKey;
+                }
+                else if (lineKey == key && CurrentSectionPath == "/Localization/" + LangCode)
+                {
+                    System.Diagnostics.Debug.WriteLine("KEY FOUND - Updating it:{0}={1}", key,value);
+                    newLines.Add(string.Format("\t\t{0} = {1}", key, value));
+                    AddedTag = true;
+
+                    //dont add the original line in this case
+                    continue;
+                }
+                newLines.Add(line);
+            }
+            File.WriteAllLines(filePath, newLines.ToArray());
         }
 
         public delegate void RefactorComplete();
