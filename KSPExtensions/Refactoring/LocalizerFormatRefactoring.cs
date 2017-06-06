@@ -73,40 +73,6 @@ namespace KSPExtensions.Refactoring
 
             //Get the document
             var root = await document.GetSyntaxRootAsync(cancellationToken);
-
-            //find the Trivial that marks the end of this line
-            bool foundEOL = false;
-            SyntaxNode objToCheck = litDecl;
-            SyntaxTrivia objEOL = SyntaxFactory.Comment(" ");
-            while (!foundEOL)
-            {
-                objToCheck = objToCheck.Parent;
-
-                if (objToCheck.ChildNodesAndTokens().Last().HasTrailingTrivia)
-                {
-                    foreach (SyntaxTrivia item in objToCheck.ChildNodesAndTokens().Last().GetTrailingTrivia())
-                    {
-                        if(item.Kind() == SyntaxKind.EndOfLineTrivia)
-                        {
-                            foundEOL = true;
-                            objEOL = item;
-                            break;
-                        }
-                    }
-                }
-                if(objToCheck == root)
-                {
-                    break;
-                }
-            }
-
-            var tabs = SyntaxFactory.Whitespace("\t\t");
-            var comment = SyntaxFactory.Comment(newIDKey + " = " + newValue);
-            List<SyntaxTrivia> lineComment = new List<SyntaxTrivia>();
-            lineComment.Add(tabs);
-            lineComment.Add(comment);
-
-
             var newroot = (CompilationUnitSyntax)root;
 
             //Set up the call to Localizer.Format
@@ -117,23 +83,65 @@ namespace KSPExtensions.Refactoring
             var arg = SyntaxFactory.Argument(SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(newIDKey)));
             var argList = SyntaxFactory.SeparatedList(new[] { arg });
 
+            var syntaxAnnotation = new SyntaxAnnotation("LocalizerFormat");
+
             SyntaxNode writecall =
                 SyntaxFactory.InvocationExpression(memberaccess,
                     SyntaxFactory.ArgumentList(argList)
 
-            );
+            ).WithAdditionalAnnotations(syntaxAnnotation);
 
+            newroot = newroot.ReplaceNode(litDecl, (SyntaxNode)writecall);
+
+            //get the changed node back from teh updated document root
+            var replacedNode = newroot.GetAnnotatedNodes(syntaxAnnotation).Single();
+
+            //find the Trivial that marks the end of this line
+            bool foundEOL = false;
+            SyntaxNode objToCheck = replacedNode;
+            SyntaxTrivia objEOL = SyntaxFactory.Comment(" ");
+
+            //This look works upwards through the structure by parent to get bigger bits of the 
+            // syntax tree to find the first EOL after the replaced Node
+            while (!foundEOL)
+            {
+                //Go up one level
+                objToCheck = objToCheck.Parent;
+
+                //If we found it get out
+                if(FindEOLAfter(objToCheck, replacedNode.FullSpan.End,ref objEOL))
+                {
+                    foundEOL = true;
+                }
+
+                //If we just checked the whole document then stop looping
+                if (objToCheck == root)
+                {
+                    break;
+                }
+            }
+
+            //If we found the EOL Trivia then insert the new comment before it
+            if (foundEOL)
+            {
+                var tabs = SyntaxFactory.Whitespace("\t\t");
+                var comment = SyntaxFactory.Comment("// " + newIDKey + " = " + newValue);
+                List<SyntaxTrivia> lineComment = new List<SyntaxTrivia>();
+                lineComment.Add(tabs);
+                lineComment.Add(comment);
+
+                newroot = newroot.InsertTriviaBefore(objEOL, lineComment);
+            }
+
+            //Make sure the file has a usings so the short name works
+            if (!newroot.Usings.Any(u => u.Name.GetText().ToString() == "KSP.Localization"))
+            {
+                newroot = newroot.AddUsings(SyntaxFactory.UsingDirective(SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName("KSP"), SyntaxFactory.IdentifierName("Localization"))));
+            }
+                         
+            //Now convert it to the document to send it back
             try
             {
-                if (newroot.Usings.Any(u => u.Name.GetText().ToString() == "KSP.Localization"))
-                {
-                    newroot = newroot.ReplaceNode(litDecl, (SyntaxNode)writecall).InsertTriviaBefore(objEOL,lineComment);
-                }
-                else
-                {
-                    newroot = newroot.ReplaceNode(litDecl, (SyntaxNode)writecall).InsertTriviaBefore(objEOL, lineComment).AddUsings(SyntaxFactory.UsingDirective(SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName("KSP"), SyntaxFactory.IdentifierName("Localization"))));
-                }
-
                 var result = document.WithSyntaxRoot(newroot);
 
                 return result;
@@ -144,6 +152,56 @@ namespace KSPExtensions.Refactoring
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Search the Children of this object for an EOL Trivia after the position of the replacedNode
+        /// </summary>
+        /// <param name="objToSearch">The Node or Token to search the children of (and then itself) for a SyntaxKind.EndOfLineTrivia</param>
+        /// <param name="endReplacedSpan">The character position at the end of the replacedNode - dont want EOLs from before the replacement</param>
+        /// <param name="foundEOL">the object to get back to the top when we find it</param>
+        /// <returns>True if we found  it</returns>
+        bool FindEOLAfter(SyntaxNodeOrToken objToSearch,int endReplacedSpan, ref SyntaxTrivia foundEOL)
+        {
+            // Guard for the object is before the replacedNode
+            if (objToSearch.FullSpan.End < endReplacedSpan)
+                return false;
+
+            // Search each child for the trivia
+            foreach (SyntaxNodeOrToken n in objToSearch.ChildNodesAndTokens())
+            {
+                if (n.FullSpan.End < endReplacedSpan)
+                    continue;
+
+                if (FindEOLAfter(n, endReplacedSpan, ref foundEOL))
+                {
+                    return true;
+                }
+            }
+
+            // Now search this object
+            foreach (SyntaxTrivia item in objToSearch.GetLeadingTrivia())
+            {
+                //Dont bother if the start of the element is before the replaced Node
+                if (objToSearch.FullSpan.Start < endReplacedSpan)
+                    continue;
+
+                if (item.Kind() == SyntaxKind.EndOfLineTrivia)
+                {
+                    foundEOL = item;
+                    return true;
+                }
+            }
+            foreach (SyntaxTrivia item in objToSearch.GetTrailingTrivia())
+            {
+                if (item.Kind() == SyntaxKind.EndOfLineTrivia)
+                {
+                    foundEOL = item;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void Action_OnDocumentChanged()
