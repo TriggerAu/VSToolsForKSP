@@ -96,6 +96,10 @@ namespace KSPExtensions.ToolWindows
 
                 Settingstabs.SelectedItem = tabSettings;
 
+                MultiFile.IsEnabled = CurrentProject.LocalizerSettings.ProjectSettings.UseMultiCfgFiles;
+                BaseFile.IsEnabled = !CurrentProject.LocalizerSettings.ProjectSettings.UseMultiCfgFiles;
+                BaseFileSelector.IsEnabled = !CurrentProject.LocalizerSettings.ProjectSettings.UseMultiCfgFiles;
+
                 UpdateSampleText(true);
             }
             else
@@ -119,6 +123,10 @@ namespace KSPExtensions.ToolWindows
         private void TagComboChanged(object sender, SelectionChangedEventArgs e)
         {
             CurrentProject.LocalizerSettings.ProjectSettings.IDType = (LocalizerProjectSettings.IDTypeEnum)idOptionsCombo.SelectedValue;
+
+            tagProjectID.IsEnabled = CurrentProject.LocalizerSettings.ProjectSettings.IDType == LocalizerProjectSettings.IDTypeEnum.ProjectBased;
+            tagUserID.IsEnabled = CurrentProject.LocalizerSettings.ProjectSettings.IDType == LocalizerProjectSettings.IDTypeEnum.UserBased;
+
             UpdateSampleText();
         }
 
@@ -160,6 +168,15 @@ namespace KSPExtensions.ToolWindows
             {
                 BaseFile.Text = dlg.FileName;
             }
+        }
+
+        private void cfgLanguageMultiFile_Changed(object sender, RoutedEventArgs e)
+        {
+            MultiFile.IsEnabled = CurrentProject.LocalizerSettings.ProjectSettings.UseMultiCfgFiles;
+            BaseFile.IsEnabled = !CurrentProject.LocalizerSettings.ProjectSettings.UseMultiCfgFiles;
+            BaseFileSelector.IsEnabled = !CurrentProject.LocalizerSettings.ProjectSettings.UseMultiCfgFiles;
+
+            UpdateSampleText();
         }
     }
 }

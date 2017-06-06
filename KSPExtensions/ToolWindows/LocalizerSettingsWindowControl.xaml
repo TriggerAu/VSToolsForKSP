@@ -89,8 +89,22 @@
 
                     <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3" FontWeight="Bold" Padding="0 6 0 6">File Components:</TextBlock>
 
-                    <TextBlock Grid.Row="9" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center">Base cfg file:</TextBlock>
-                    <Grid Grid.Row="9" Grid.Column="2" Margin="2">
+                    <TextBlock Grid.Row="9" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center" Text="Languages:">
+                        <TextBlock.ToolTip>
+                            <ToolTip>
+                                <TextBlock>Comma separated list of languag codes</TextBlock>
+                            </ToolTip>
+                        </TextBlock.ToolTip>
+                    </TextBlock>
+                    <TextBox Grid.Row="9" Grid.Column="2" Margin="2" Name="cfgLanguages" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=LocalizerSettings.ProjectSettings.LanguageCodes, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+
+                    <StackPanel Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal">
+                        <TextBlock Padding="8,3,0,3" VerticalAlignment="Center" >Store each language in a new file:</TextBlock>
+                        <CheckBox  Margin="8,0,0,0" VerticalAlignment="Center"  Name="cfgLanguageMultiFile" Checked="cfgLanguageMultiFile_Changed" Unchecked="cfgLanguageMultiFile_Changed"  IsChecked="{Binding Path=LocalizerSettings.ProjectSettings.UseMultiCfgFiles, UpdateSourceTrigger=PropertyChanged}"></CheckBox>
+                    </StackPanel>
+
+                    <TextBlock Grid.Row="11" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center">Base cfg file:</TextBlock>
+                    <Grid Grid.Row="11" Grid.Column="2" Margin="2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="24"/>
@@ -98,20 +112,6 @@
                         <TextBox Grid.Column="0" Name="BaseFile"  KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=LocalizerSettings.ProjectSettings.BaseCfgFile, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}"></TextBox>
                         <Button Grid.Column="1" Name="BaseFileSelector" Click="BaseFileSelector_Click">F</Button>
                     </Grid>
-
-                    <TextBlock Grid.Row="10" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center" Text="Languages:">
-                        <TextBlock.ToolTip>
-                            <ToolTip>
-                                <TextBlock>Comma separated list of languag codes</TextBlock>
-                            </ToolTip>
-                        </TextBlock.ToolTip>
-                    </TextBlock>
-                    <TextBox Grid.Row="10" Grid.Column="2" Margin="2" Name="cfgLanguages" KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=LocalizerSettings.ProjectSettings.LanguageCodes, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-
-                    <StackPanel Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal">
-                        <TextBlock Padding="8,3,0,3" VerticalAlignment="Center" >Store each language in a new file:</TextBlock>
-                        <CheckBox  Margin="8,0,0,0" VerticalAlignment="Center"  Name="cfgLanguageMultiFile" IsChecked="{Binding Path=LocalizerSettings.UserSettings.UseMultiCfgFiles, UpdateSourceTrigger=PropertyChanged}"></CheckBox>
-                    </StackPanel>
 
                     <TextBlock Grid.Row="12" Grid.Column="0" Padding="8,0,0,0" VerticalAlignment="Center">Multi File Path:</TextBlock>
                     <TextBox  Grid.Row="12" Grid.Column="2" Name="MultiFile"  KeyDown="TagTextKeyDown" TextChanged="TagTextChanged" Text="{Binding Path=LocalizerSettings.ProjectSettings.MultiCfgFile, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}">
@@ -128,7 +128,7 @@
 
 
 
-        <StackPanel Name="Footer" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Name="Footer" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="Hidden">
             <TextBlock Padding="0,0,5,0">KSP Assemblies:</TextBlock>
             <TextBlock Name="kspDetectedText" Width="80">Not Detected</TextBlock>
         </StackPanel>
