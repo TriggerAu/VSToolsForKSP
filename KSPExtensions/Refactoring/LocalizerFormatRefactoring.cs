@@ -89,7 +89,8 @@ namespace KSPExtensions.Refactoring
                 SyntaxFactory.InvocationExpression(memberaccess,
                     SyntaxFactory.ArgumentList(argList)
 
-            ).WithAdditionalAnnotations(syntaxAnnotation);
+            ).WithAdditionalAnnotations(syntaxAnnotation).WithTriviaFrom(litDecl);
+            
 
             newroot = newroot.ReplaceNode(litDecl, (SyntaxNode)writecall);
 
