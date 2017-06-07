@@ -217,7 +217,7 @@
     <VSCTCompile Include="ToolWindows\CorePackage.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
-    <Content Include="ToolWindows\Resources\LocalizerSettingsWindowCommand.png" />
+    <Content Include="ToolWindows\Resources\LocalizerSettingsWindow.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="VSPackage.resx">
