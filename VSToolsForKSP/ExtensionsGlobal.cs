@@ -87,9 +87,16 @@ namespace VSToolsForKSP
         //internal static IVsOutputWindowPane generalPane;
         void InitializeExtensibility()
         {
-            dte = base.GetService(typeof(DTE)) as DTE;
+            OutputManager.Initialize(this);
+            OutputManager.WriteLine("Extensions Global Initialized.");
 
+            dte = base.GetService(typeof(DTE)) as DTE;
             ProjectsManager.Initialize(dte);
+
+            OutputManager.WriteLine("Projects Manager Running.");
+
+
+            //ErrorsManager.Initialize(this);
 
             //outputWindow = base.GetService(typeof(SVsOutputWindow)) as IVsOutputWindow;
             //Guid generalPaneGuid = VSConstants.GUID_OutWindowGeneralPane;

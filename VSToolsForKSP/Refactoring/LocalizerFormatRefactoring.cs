@@ -63,93 +63,125 @@ namespace VSToolsForKSP.Refactoring
         private string newValue = "";
         private async Task<Document> ReplaceStringWithLocalizerFormat(Document document, LiteralExpressionSyntax litDecl, CancellationToken cancellationToken)
         {
-            //Get the details of the ID to use
-            currentProject = ProjectsManager.projects[document.Project.Name];
-            newIDKey = currentProject.LocalizerSettings.NextTag;
-            newValue = litDecl.ToString();
-
-            if (newValue.StartsWith("\"")) newValue = newValue.Substring(1);
-            if (newValue.EndsWith("\"")) newValue = newValue.Substring(0,newValue.Length-1);
-
-            //Get the document
-            var root = await document.GetSyntaxRootAsync(cancellationToken);
-            var newroot = (CompilationUnitSyntax)root;
-
-            //Set up the call to Localizer.Format
-            var localizer = SyntaxFactory.IdentifierName("Localizer");
-            var format = SyntaxFactory.IdentifierName("Format");
-            var memberaccess = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, localizer, format);
-
-            var arg = SyntaxFactory.Argument(SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(newIDKey)));
-            var argList = SyntaxFactory.SeparatedList(new[] { arg });
-
-            var syntaxAnnotation = new SyntaxAnnotation("LocalizerFormat");
-
-            SyntaxNode writecall =
-                SyntaxFactory.InvocationExpression(memberaccess,
-                    SyntaxFactory.ArgumentList(argList)
-
-            ).WithAdditionalAnnotations(syntaxAnnotation).WithTriviaFrom(litDecl);
-            
-
-            newroot = newroot.ReplaceNode(litDecl, (SyntaxNode)writecall);
-
-            //get the changed node back from teh updated document root
-            var replacedNode = newroot.GetAnnotatedNodes(syntaxAnnotation).Single();
-
-            //find the Trivial that marks the end of this line
-            bool foundEOL = false;
-            SyntaxNode objToCheck = replacedNode;
-            SyntaxTrivia objEOL = SyntaxFactory.Comment(" ");
-
-            //This look works upwards through the structure by parent to get bigger bits of the 
-            // syntax tree to find the first EOL after the replaced Node
-            while (!foundEOL)
-            {
-                //Go up one level
-                objToCheck = objToCheck.Parent;
-
-                //If we found it get out
-                if(FindEOLAfter(objToCheck, replacedNode.FullSpan.End,ref objEOL))
-                {
-                    foundEOL = true;
-                }
-
-                //If we just checked the whole document then stop looping
-                if (objToCheck == root)
-                {
-                    break;
-                }
-            }
-
-            //If we found the EOL Trivia then insert the new comment before it
-            if (foundEOL)
-            {
-                var tabs = SyntaxFactory.Whitespace("\t\t");
-                var comment = SyntaxFactory.Comment("// " + newIDKey + " = " + newValue);
-                List<SyntaxTrivia> lineComment = new List<SyntaxTrivia>();
-                lineComment.Add(tabs);
-                lineComment.Add(comment);
-
-                newroot = newroot.InsertTriviaBefore(objEOL, lineComment);
-            }
-
-            //Make sure the file has a usings so the short name works
-            if (!newroot.Usings.Any(u => u.Name.GetText().ToString() == "KSP.Localization"))
-            {
-                newroot = newroot.AddUsings(SyntaxFactory.UsingDirective(SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName("KSP"), SyntaxFactory.IdentifierName("Localization"))));
-            }
-                         
-            //Now convert it to the document to send it back
             try
             {
-                var result = document.WithSyntaxRoot(newroot);
+                //Get the details of the ID to use
+                currentProject = ProjectsManager.projects[document.Project.Name];
+                newIDKey = currentProject.LocalizerSettings.NextTag;
+                newValue = litDecl.ToString();
 
-                return result;
+                if (newValue.StartsWith("\"")) newValue = newValue.Substring(1);
+                if (newValue.EndsWith("\"")) newValue = newValue.Substring(0, newValue.Length - 1);
+
+                //Get the document
+                var root = await document.GetSyntaxRootAsync(cancellationToken);
+                CompilationUnitSyntax newroot = (CompilationUnitSyntax)root;
+
+                SyntaxNode replacedNode;
+                try
+                {
+                    //Set up the call to Localizer.Format
+                    IdentifierNameSyntax localizer = SyntaxFactory.IdentifierName("Localizer");
+                    IdentifierNameSyntax format = SyntaxFactory.IdentifierName("Format");
+                    MemberAccessExpressionSyntax memberaccess = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, localizer, format);
+
+                    ArgumentSyntax arg = SyntaxFactory.Argument(SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(newIDKey)));
+                    SeparatedSyntaxList<ArgumentSyntax> argList = SyntaxFactory.SeparatedList(new[] { arg });
+
+                    SyntaxAnnotation syntaxAnnotation = new SyntaxAnnotation("LocalizerFormat");
+
+                    SyntaxNode writecall =
+                        SyntaxFactory.InvocationExpression(memberaccess,
+                            SyntaxFactory.ArgumentList(argList)
+
+                    ).WithAdditionalAnnotations(syntaxAnnotation).WithTriviaFrom(litDecl);
+
+
+                     newroot = newroot.ReplaceNode(litDecl, (SyntaxNode)writecall);
+
+                    //get the changed node back from teh updated document root
+                    replacedNode = newroot.GetAnnotatedNodes(syntaxAnnotation).Single();
+                }
+                catch (Exception ex)
+                {
+                    OutputManager.WriteErrorEx(ex, "Unable to compile the Localizer call. Refactor cancelled.");
+                    return null;
+                }
+
+                try
+                {
+                    //find the Trivial that marks the end of this line
+                    bool foundEOL = false;
+                    SyntaxNode objToCheck = replacedNode;
+                    SyntaxTrivia objEOL = SyntaxFactory.Comment(" ");
+
+                    //This look works upwards through the structure by parent to get bigger bits of the 
+                    // syntax tree to find the first EOL after the replaced Node
+                    while (!foundEOL)
+                    {
+                        //Go up one level
+                        objToCheck = objToCheck.Parent;
+
+                        //If we found it get out
+                        if (FindEOLAfter(objToCheck, replacedNode.FullSpan.End, ref objEOL))
+                        {
+                            foundEOL = true;
+                        }
+
+                        //If we just checked the whole document then stop looping
+                        if (objToCheck == root)
+                        {
+                            break;
+                        }
+                    }
+
+                    //If we found the EOL Trivia then insert the new comment before it
+                    if (foundEOL)
+                    {
+                        var tabs = SyntaxFactory.Whitespace("\t\t");
+                        var comment = SyntaxFactory.Comment("// " + newIDKey + " = " + newValue);
+                        List<SyntaxTrivia> lineComment = new List<SyntaxTrivia>();
+                        lineComment.Add(tabs);
+                        lineComment.Add(comment);
+
+                        newroot = newroot.InsertTriviaBefore(objEOL, lineComment);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    OutputManager.WriteErrorEx(ex, "Unable to add comment to end of line. Add it manually if you like.");
+                }
+
+
+                try { 
+                //Make sure the file has a usings so the short name works
+                if (!newroot.Usings.Any(u => u.Name.GetText().ToString() == "KSP.Localization"))
+                {
+                    newroot = newroot.AddUsings(SyntaxFactory.UsingDirective(SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName("KSP"), SyntaxFactory.IdentifierName("Localization"))));
+                }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("[LocalizerFormatRefactoring]: Failed in refactoring - " + ex.Message);
+                OutputManager.WriteErrorEx(ex, "Unable to add usings line to head of file. Add it manually.");
+            }
+
+            //Now convert it to the document to send it back
+            try
+            {
+                    var result = document.WithSyntaxRoot(newroot);
+
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    OutputManager.WriteErrorEx(ex, "Unable to rewrite the document. Refactor cancelled.");
+                    return null;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                OutputManager.WriteErrorEx(ex, "General error refactoring the token. Refactor cancelled.");
             }
 
             return null;
@@ -162,7 +194,7 @@ namespace VSToolsForKSP.Refactoring
         /// <param name="endReplacedSpan">The character position at the end of the replacedNode - dont want EOLs from before the replacement</param>
         /// <param name="foundEOL">the object to get back to the top when we find it</param>
         /// <returns>True if we found  it</returns>
-        bool FindEOLAfter(SyntaxNodeOrToken objToSearch,int endReplacedSpan, ref SyntaxTrivia foundEOL)
+        bool FindEOLAfter(SyntaxNodeOrToken objToSearch, int endReplacedSpan, ref SyntaxTrivia foundEOL)
         {
             // Guard for the object is before the replacedNode
             if (objToSearch.FullSpan.End < endReplacedSpan)
@@ -207,6 +239,8 @@ namespace VSToolsForKSP.Refactoring
 
         private void Action_OnDocumentChanged()
         {
+            OutputManager.WriteLine("\nRefactor commited. Adding tags to language files...");
+
             //if this fires then we changed the actual file
             //Write the value to the cfg files...
             string[] langCodes = currentProject.LocalizerSettings.ProjectSettings.LanguageCodes.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
@@ -217,24 +251,14 @@ namespace VSToolsForKSP.Refactoring
                 {
                     destinationFile = currentProject.LocalizerSettings.ProjectSettings.MultiCfgFile.Replace("{LANGCODE}", langCode);
                 }
+                OutputManager.WriteLine("Adding key and value to {0} in {1}", langCode, destinationFile);
 
-                AddTagToFile(newIDKey, newValue, langCode, destinationFile);
+                if (!AddTagToFile(newIDKey, newValue, langCode, destinationFile))
+                {
+                    OutputManager.WriteLine("Error Detected. Skipping any other languages. CHECK THE CONSOLE, YOUR CFG AND SOURCE FOR ID MISMATCHES!!!!");
+                    return;
+                }
             }
-
-                
-
-            //string cfgFile = currentProject.LocalizerSettings.ProjectSettings.BaseCfgFile;
-            //if (!File.Exists(cfgFile))
-            //{
-            //    File.WriteAllText(cfgFile, "Localization\n{\n\ten-us\n\t{\n\t}\n}\n", Encoding.UTF8);
-            //}
-
-            //List<string> fileLinesFile = File.ReadAllLines(cfgFile, Encoding.UTF8).ToList();
-            //fileLinesFile.Insert(
-            //        fileLinesFile.Count - 2,
-            //        string.Format("\t\t{0} = {1}", newIDKey, newValue)
-            //    );
-            //File.WriteAllLines(cfgFile, fileLinesFile.ToArray(), Encoding.UTF8);
 
             //update the settings...
             if (currentProject.LocalizerSettings.IDType == Settings.LocalizerProjectSettings.IDTypeEnum.ProjectBased)
@@ -252,79 +276,90 @@ namespace VSToolsForKSP.Refactoring
             OnRefactorComplete?.Invoke();
         }
 
-        private void AddTagToFile(string key, string value, string LangCode, string filePath)
+        private bool AddTagToFile(string key, string value, string LangCode, string filePath)
         {
-            if (!File.Exists(filePath))
+            try
             {
-                File.WriteAllText(filePath, "Localization\n{\n\t" + LangCode + "\n\t{\n\t}\n}\n", Encoding.UTF8);
-            }
-
-            string[] oldLines = File.ReadAllLines(filePath);
-
-            List<string> newLines = new List<string>();
-
-            int cfgLevel = 0;
-            string NextCfgSection = "", CurrentCfgSection = "", CurrentSectionPath = "";
-            Stack<string> previousSectionStack = new Stack<string>();
-
-            bool AddedTag = false;
-            foreach (string line in oldLines)
-            {
-                //If we already added the tag then just buildthe rest of the file
-                if (AddedTag)
+                if (!File.Exists(filePath))
                 {
+                    File.WriteAllText(filePath, "Localization\n{\n\t" + LangCode + "\n\t{\n\t}\n}\n", Encoding.UTF8);
+                }
+
+                string[] oldLines = File.ReadAllLines(filePath);
+
+                List<string> newLines = new List<string>();
+
+                int cfgLevel = 0;
+                string NextCfgSection = "", CurrentCfgSection = "", CurrentSectionPath = "";
+                Stack<string> previousSectionStack = new Stack<string>();
+
+                bool AddedTag = false;
+                foreach (string line in oldLines)
+                {
+                    //If we already added the tag then just buildthe rest of the file
+                    if (AddedTag)
+                    {
+                        newLines.Add(line);
+                        continue;
+                    }
+
+                    string[] pairs = line.Split(new char[] { '=' }, 2);
+                    string lineKey = pairs[0].Trim();
+                    if (lineKey == "{")
+                    {
+                        cfgLevel++;
+                        previousSectionStack.Push(CurrentCfgSection);
+                        CurrentCfgSection = NextCfgSection;
+                        CurrentSectionPath += "/" + NextCfgSection;
+                        //System.Diagnostics.Debug.WriteLine("Opening:{0}-{1}", cfgLevel, CurrentSectionPath);
+                    }
+                    else if (lineKey == "}")
+                    {
+                        //System.Diagnostics.Debug.WriteLine("Closing:{0}-{1}", cfgLevel, CurrentSectionPath);
+
+                        if (CurrentSectionPath == "/Localization/" + LangCode)
+                        {
+                            OutputManager.WriteLine("\tLanguage Code found - Adding new key: {0}={1}", key, value);
+                            newLines.Add(string.Format("\t\t{0} = {1}", key, value));
+                            AddedTag = true;
+                        }
+                        else if (CurrentSectionPath == "/Localization" && AddedTag == false)
+                        {
+                            OutputManager.WriteLine("\tLanguage Code missing - Adding new section: {0}={1}", key, value);
+                            newLines.Add(string.Format("\t{0}", LangCode));
+                            newLines.Add(string.Format("\t{{"));
+                            newLines.Add(string.Format("\t\t{0} = {1}", key, value));
+                            newLines.Add(string.Format("\t}}"));
+                            AddedTag = true;
+                        }
+
+                        CurrentCfgSection = previousSectionStack.Pop();
+                        CurrentSectionPath = CurrentSectionPath.Substring(0, CurrentSectionPath.LastIndexOf("/"));
+                        cfgLevel--;
+                    }
+                    else if (pairs.Length < 2)
+                    {
+                        NextCfgSection = lineKey;
+                    }
+                    else if (lineKey == key && CurrentSectionPath == "/Localization/" + LangCode)
+                    {
+                        OutputManager.WriteLine("\tKey found in file - Updating it: {0}={1}", key, value);
+                        newLines.Add(string.Format("\t\t{0} = {1}", key, value));
+                        AddedTag = true;
+
+                        //dont add the original line in this case
+                        continue;
+                    }
                     newLines.Add(line);
-                    continue;
                 }
-
-                string[] pairs = line.Split(new char[] { '=' }, 2);
-                string lineKey = pairs[0].Trim();
-                if (lineKey == "{")
-                {
-                    cfgLevel++;
-                    previousSectionStack.Push(CurrentCfgSection);
-                    CurrentCfgSection = NextCfgSection;
-                    CurrentSectionPath += "/" + NextCfgSection;
-                    System.Diagnostics.Debug.WriteLine("Opening:{0}-{1}", cfgLevel, CurrentSectionPath);
-                }
-                else if (lineKey == "}")
-                {
-                    System.Diagnostics.Debug.WriteLine("Closing:{0}-{1}", cfgLevel, CurrentSectionPath);
-
-                    if (CurrentSectionPath == "/Localization/" + LangCode)
-                    {
-                        newLines.Add(string.Format("\t\t{0} = {1}", key, value));
-                        AddedTag = true;
-                    }
-                    else if (CurrentSectionPath == "/Localization" && AddedTag == false)
-                    {
-                        newLines.Add(string.Format("\t{0}", LangCode));
-                        newLines.Add(string.Format("\t{{"));
-                        newLines.Add(string.Format("\t\t{0} = {1}", key, value));
-                        newLines.Add(string.Format("\t}}"));
-                        AddedTag = true;
-                    }
-
-                    CurrentCfgSection = previousSectionStack.Pop();
-                    CurrentSectionPath = CurrentSectionPath.Substring(0, CurrentSectionPath.LastIndexOf("/"));
-                    cfgLevel--;
-                }
-                else if (pairs.Length < 2)
-                {
-                    NextCfgSection = lineKey;
-                }
-                else if (lineKey == key && CurrentSectionPath == "/Localization/" + LangCode)
-                {
-                    System.Diagnostics.Debug.WriteLine("KEY FOUND - Updating it:{0}={1}", key,value);
-                    newLines.Add(string.Format("\t\t{0} = {1}", key, value));
-                    AddedTag = true;
-
-                    //dont add the original line in this case
-                    continue;
-                }
-                newLines.Add(line);
+                File.WriteAllLines(filePath, newLines.ToArray());
             }
-            File.WriteAllLines(filePath, newLines.ToArray());
+            catch (Exception ex)
+            {
+                OutputManager.WriteErrorEx(ex, "\nUnable to add tag to file\n\tTag:\t\t{0}\n\tLanguage:\t{1}\n\tFile:\t\t{2}", key, LangCode, filePath);
+                return false;
+            }
+            return true;
         }
 
         public delegate void RefactorComplete();

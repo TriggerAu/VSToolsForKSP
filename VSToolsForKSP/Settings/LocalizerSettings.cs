@@ -23,22 +23,34 @@ namespace VSToolsForKSP.Settings
             ProjectSettings.WriteXML(projectPath + "/.ksplocalizer.settings");
             UserSettings.WriteXML(projectPath + "/.ksplocalizer.settings.user");
         }
-
-        public string NextTag { get {
-                string returnValue = "";
-
-                returnValue += ProjectSettings.TagAutoLocPortion + "_";
-                if (!string.IsNullOrWhiteSpace( ProjectSettings.TagProjectPortion))
-                    returnValue += ProjectSettings.TagProjectPortion + "_";
-
-                if(ProjectSettings.IDType == LocalizerProjectSettings.IDTypeEnum.ProjectBased)
-                { 
-                    returnValue += ProjectSettings.NextProjectID;
+        
+        public int NextID
+        {
+            get
+            {
+                if (ProjectSettings.IDType == LocalizerProjectSettings.IDTypeEnum.ProjectBased)
+                {
+                    return ProjectSettings.NextProjectID;
                 }
                 else
                 {
-                    returnValue += UserSettings.NextUserID;
+                    return UserSettings.NextUserID;
                 }
+            }
+        }
+
+        public string NextTag
+        {
+            get
+            {
+                string returnValue = "";
+
+                returnValue += ProjectSettings.TagAutoLocPortion + "_";
+                if (!string.IsNullOrWhiteSpace(ProjectSettings.TagProjectPortion))
+                    returnValue += ProjectSettings.TagProjectPortion + "_";
+
+                returnValue += NextID;
+
                 return returnValue;
             }
         }

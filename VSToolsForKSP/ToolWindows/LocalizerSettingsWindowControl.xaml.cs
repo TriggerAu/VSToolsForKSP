@@ -66,6 +66,7 @@ namespace VSToolsForKSP.ToolWindows
             }
             else
             {
+                OutputManager.WriteLine("No projects in current solution.");
                 ComboBoxItem none = new ComboBoxItem();
                 TextBlock tb = new TextBlock();
                 tb.Text = "No Projects Loaded";
@@ -91,6 +92,7 @@ namespace VSToolsForKSP.ToolWindows
 
             if (CurrentProject.HasLocalizerSettings)
             {
+                OutputManager.WriteLine("Selected project has Localizer settings. Setting up the databind...");
                 //load the text boxes
                 this.DataContext = this.CurrentProject;
                 //tagProjectPortion.Text = CurrentProject.localizerSettings.ProjectSettings.TagProjectPortion;
@@ -105,6 +107,7 @@ namespace VSToolsForKSP.ToolWindows
             }
             else
             {
+                OutputManager.WriteLine("Selected project has no Localizer settings.");
                 Settingstabs.SelectedItem = tabNoSettings;
 
             }
