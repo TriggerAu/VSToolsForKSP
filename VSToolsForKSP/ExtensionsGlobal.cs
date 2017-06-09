@@ -18,8 +18,9 @@ using Microsoft.Win32;
 using EnvDTE;
 using VSLangProj;
 using System.Collections.Generic;
+using VSToolsForKSP.Managers;
 
-namespace KSPExtensions
+namespace VSToolsForKSP
 {
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.
@@ -47,7 +48,7 @@ namespace KSPExtensions
     [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionHasMultipleProjects_string)]
     [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionHasSingleProject_string)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideToolWindow(typeof(KSPExtensions.ToolWindows.LocalizerSettingsWindow))]
+    [ProvideToolWindow(typeof(VSToolsForKSP.ToolWindows.LocalizerSettingsWindow))]
     public sealed class ExtensionsGlobal : Package
     {
         /// <summary>
@@ -77,7 +78,7 @@ namespace KSPExtensions
             base.Initialize();
 
             InitializeExtensibility();
-            KSPExtensions.ToolWindows.LocalizerSettingsWindowCommand.Initialize(this);
+            VSToolsForKSP.ToolWindows.LocalizerSettingsWindowCommand.Initialize(this);
         }
         #endregion
 

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KSPExtensions.Settings
+namespace VSToolsForKSP.Settings
 {
     public class LocalizerSettings : BaseSettings
     {

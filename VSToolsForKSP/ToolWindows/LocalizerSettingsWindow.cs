@@ -4,7 +4,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace KSPExtensions.ToolWindows
+namespace VSToolsForKSP.ToolWindows
 {
     using System;
     using System.Runtime.InteropServices;

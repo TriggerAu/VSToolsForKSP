@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using System.Threading;
 
-namespace KSPExtensions.Refactoring
+namespace VSToolsForKSP.Refactoring
 {
     /// <summary>
     /// This class is an overridden CodeAction so we can detect when a change actually occured and then process items on that event

@@ -4,18 +4,19 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace KSPExtensions.ToolWindows
+namespace VSToolsForKSP.ToolWindows
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Windows;
     using System.Windows.Controls;
 
-    using KSPExtensions.Settings;
+    using VSToolsForKSP.Settings;
     using System.Windows.Data;
     using System.Windows.Media;
     using System.IO;
     using Microsoft.Win32;
+    using VSToolsForKSP.Managers;
 
     /// <summary>
     /// Interaction logic for LocalizerSettingsWindowControl.
@@ -41,7 +42,7 @@ namespace KSPExtensions.ToolWindows
 
             UpdateProjectsDropdown();
 
-            KSPExtensions.Refactoring.LocalizerFormatRefactoring.OnRefactorComplete += LocalizerFormatRefactoring_OnRefactorComplete;
+            VSToolsForKSP.Refactoring.LocalizerFormatRefactoring.OnRefactorComplete += LocalizerFormatRefactoring_OnRefactorComplete;
         }
 
         private void LocalizerFormatRefactoring_OnRefactorComplete()

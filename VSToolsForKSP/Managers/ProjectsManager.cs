@@ -1,5 +1,5 @@
 ﻿using EnvDTE;
-using KSPExtensions.Settings;
+using VSToolsForKSP.Settings;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VSLangProj;
 
-namespace KSPExtensions
+namespace VSToolsForKSP.Managers
 {
     internal static class ProjectsManager
     {
@@ -48,6 +48,7 @@ namespace KSPExtensions
         }
         private static void SolutionChanged()
         {
+            OutputManager.WriteLine("Solution change detected. Parsing list of open projects...");
             projects.Clear();
 
             ProjectDetails newProj;

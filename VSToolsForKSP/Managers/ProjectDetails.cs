@@ -1,11 +1,11 @@
-﻿using KSPExtensions.Settings;
+﻿using VSToolsForKSP.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KSPExtensions
+namespace VSToolsForKSP.Managers
 {
     public class ProjectDetails
     {

@@ -14,8 +14,9 @@ using Microsoft.CodeAnalysis.Rename;
 using Microsoft.CodeAnalysis.Text;
 using System.IO;
 using System.Text;
+using VSToolsForKSP.Managers;
 
-namespace KSPExtensions.Refactoring
+namespace VSToolsForKSP.Refactoring
 {
     [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(LocalizerFormatRefactoring)), Shared]
     internal class LocalizerFormatRefactoring : CodeRefactoringProvider
@@ -57,8 +58,8 @@ namespace KSPExtensions.Refactoring
         }
 
         private ProjectDetails currentProject;
-        
-        private string newIDKey="";
+
+        private string newIDKey = "";
         private string newValue = "";
         private async Task<Document> ReplaceStringWithLocalizerFormat(Document document, LiteralExpressionSyntax litDecl, CancellationToken cancellationToken)
         {
