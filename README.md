@@ -3,5 +3,8 @@ A project for me to publish VS Extension type stuff for helping develop code for
 
 Written to help speed up modding capabilities
 
-Forum Thread: COMING SOON
-Author: TriggerAu
+Forum Thread: COMING SOON  
+Author: TriggerAu  
+
+## Licensing
+Extension icon is a rocket from https://icons8.com with a background and overlay layer
