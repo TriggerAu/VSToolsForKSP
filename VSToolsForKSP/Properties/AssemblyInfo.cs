@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("VSExtensionsForKSP")]
-[assembly: AssemblyDescription("Visual Studio Extensions for KSP")]
+[assembly: AssemblyTitle("VSToolsForKSP")]
+[assembly: AssemblyDescription("Visual Studio Tools for KSP")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("VSExtensionsForKSP")]
+[assembly: AssemblyProduct("VSToolsForKSP")]
 [assembly: AssemblyCopyright("David Tregoning")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
