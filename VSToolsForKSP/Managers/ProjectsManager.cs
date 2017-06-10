@@ -48,7 +48,7 @@ namespace VSToolsForKSP.Managers
         }
         private static void SolutionChanged()
         {
-            OutputManager.WriteLine("Solution change detected. Parsing list of open projects...");
+            OutputManager.WriteLine("\nSolution change detected. Parsing list of open projects...");
             projects.Clear();
 
             ProjectDetails newProj;
@@ -81,11 +81,19 @@ namespace VSToolsForKSP.Managers
                 }
 
                 //Now check we have the two files
-                if (File.Exists(newProj.FolderPath + "/.ksplocalizer.settings") && File.Exists(newProj.FolderPath + "/.ksplocalizer.settings"))
+                if (File.Exists(newProj.FolderPath + "/.ksplocalizer.settings"))
                 {
                     newProj.LocalizerSettings = new LocalizerSettings(newProj.name);
                     newProj.LocalizerSettings.ProjectSettings = LocalizerSettings.CreateFromXML<LocalizerProjectSettings>(newProj.FolderPath + "/.ksplocalizer.settings");
-                    newProj.LocalizerSettings.UserSettings = LocalizerSettings.CreateFromXML<LocalizerUserSettings>(newProj.FolderPath + "/.ksplocalizer.settings.user");
+                    if (File.Exists(newProj.FolderPath + "/.ksplocalizer.settings.user"))
+                    {
+                        newProj.LocalizerSettings.UserSettings = LocalizerSettings.CreateFromXML<LocalizerUserSettings>(newProj.FolderPath + "/.ksplocalizer.settings.user");
+                    } 
+                    else
+                    {
+                        OutputManager.WriteLine("No User Settings File Found - Creating a fresh one");
+                        newProj.LocalizerSettings.UserSettings = new LocalizerUserSettings();
+                    }
                 }
                 else
                 {

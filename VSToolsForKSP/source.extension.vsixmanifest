@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="VSToolsForKSP.David Tregoning.09061f8a-f2aa-4230-b5ee-4db6a87d96f5" Version="1.0.0" Language="en-US" Publisher="David Tregoning" />
+    <Identity Id="VSToolsForKSP.David Tregoning.09061f8a-f2aa-4230-b5ee-4db6a87d96f5" Version="1.0.1" Language="en-US" Publisher="David Tregoning" />
     <DisplayName>Visual Studio Tools for KSP</DisplayName>
     <Description xml:space="preserve">Visual Studio Tools for KSP Development</Description>
     <MoreInfo>https://github.com/TriggerAu/VSToolsForKSP</MoreInfo>
