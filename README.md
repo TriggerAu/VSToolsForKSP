@@ -3,7 +3,7 @@ A project for me to publish VS Extension type stuff for helping develop code for
 
 Written to help speed up modding capabilities
 
-Forum Thread: COMING SOON  
+Forum Thread: [Visual Studio Tools for KSP](http://forum.kerbalspaceprogram.com/index.php?/topic/161912-visual-studio-tools-for-ksp-localization-helper/)  
 Author: TriggerAu  
 
 ## Usage
