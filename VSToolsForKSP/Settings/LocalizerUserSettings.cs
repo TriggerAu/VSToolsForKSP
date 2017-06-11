@@ -18,7 +18,7 @@ namespace VSToolsForKSP.Settings
 
         public LocalizerUserSettings()
         {
-            NextUserID = 600000;
+            NextUserID = 6000000;
         }
     }
     
