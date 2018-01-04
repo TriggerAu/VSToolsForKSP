@@ -244,19 +244,34 @@ namespace VSToolsForKSP.Refactoring
             //if this fires then we changed the actual file
             //Write the value to the cfg files...
             string[] langCodes = currentProject.LocalizerSettings.ProjectSettings.LanguageCodes.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (string langCode in langCodes)
+
+            if(langCodes.Length == 0)
+            {
+                OutputManager.WriteLine("Error Detected. Theres no language codes defined. CHECK THE CONSOLE, YOUR CFG AND SOURCE FOR ID MISMATCHES!!!!");
+                return;
+            }
+
+            if (!currentProject.LocalizerSettings.ProjectSettings.UseMultiCfgFiles || currentProject.LocalizerSettings.ProjectSettings.UseMultiAndBaseCfgFiles)
             {
                 string destinationFile = currentProject.LocalizerSettings.ProjectSettings.BaseCfgFile;
-                if (currentProject.LocalizerSettings.ProjectSettings.UseMultiCfgFiles)
-                {
-                    destinationFile = currentProject.LocalizerSettings.ProjectSettings.MultiCfgFile.Replace("{LANGCODE}", langCode);
-                }
-                OutputManager.WriteLine("Adding key and value to {0} in {1}", langCode, destinationFile);
 
-                if (!AddTagToFile(newIDKey, newValue, langCode, destinationFile))
+                if (!AddTagToFile(newIDKey, newValue, langCodes[0], destinationFile,false))
                 {
                     OutputManager.WriteLine("Error Detected. Skipping any other languages. CHECK THE CONSOLE, YOUR CFG AND SOURCE FOR ID MISMATCHES!!!!");
                     return;
+                }
+            }
+            if (currentProject.LocalizerSettings.ProjectSettings.UseMultiCfgFiles)
+            {
+                foreach (string langCode in langCodes)
+                {
+                    string destinationFile = currentProject.LocalizerSettings.ProjectSettings.MultiCfgFile.Replace("{LANGCODE}", langCode);
+
+                    if (!AddTagToFile(newIDKey, newValue, langCode, destinationFile, currentProject.LocalizerSettings.ProjectSettings.AddLanguageCodePrefixToMultiFiles))
+                    {
+                        OutputManager.WriteLine("Error Detected. Skipping any other languages. CHECK THE CONSOLE, YOUR CFG AND SOURCE FOR ID MISMATCHES!!!!");
+                        return;
+                    }
                 }
             }
 
@@ -276,14 +291,32 @@ namespace VSToolsForKSP.Refactoring
             OnRefactorComplete?.Invoke();
         }
 
-        private bool AddTagToFile(string key, string value, string LangCode, string filePath)
+        /// <summary>
+        /// Adds a key/value pair to the cfg file value
+        /// </summary>
+        /// <param name="key">the autoLOC key for the string</param>
+        /// <param name="value">the value portion of the pair</param>
+        /// <param name="LangCode">the langcode thats in this file</param>
+        /// <param name="filePath">the path to the file</param>
+        /// <param name="addLangTagToValue">whether to prefix the value with [langcode]</param>
+        /// <returns></returns>
+        private bool AddTagToFile(string key, string value, string LangCode, string filePath, bool addLangTagToValue)
         {
             try
             {
+                OutputManager.WriteLine("Adding key and value to {0} in {1}", LangCode, filePath);
+
+                string langTag = "";
+                if (addLangTagToValue && !LangCode.StartsWith("en"))
+                {
+                    langTag = "[" + LangCode.Split('-')[0] + "]";
+                }
+
                 if (!File.Exists(filePath))
                 {
                     File.WriteAllText(filePath, "Localization\n{\n\t" + LangCode + "\n\t{\n\t}\n}\n", Encoding.UTF8);
                 }
+
 
                 string[] oldLines = File.ReadAllLines(filePath);
 
@@ -319,8 +352,8 @@ namespace VSToolsForKSP.Refactoring
 
                         if (CurrentSectionPath == "/Localization/" + LangCode)
                         {
-                            OutputManager.WriteLine("\tLanguage Code found - Adding new key: {0}={1}", key, value);
-                            newLines.Add(string.Format("\t\t{0} = {1}", key, value));
+                            OutputManager.WriteLine("\tLanguage Code found - Adding new key: {0}={2}{1}", key, value, langTag);
+                            newLines.Add(string.Format("\t\t{0} = {2}{1}", key, value, langTag));
                             AddedTag = true;
                         }
                         else if (CurrentSectionPath == "/Localization" && AddedTag == false)
@@ -328,7 +361,7 @@ namespace VSToolsForKSP.Refactoring
                             OutputManager.WriteLine("\tLanguage Code missing - Adding new section: {0}={1}", key, value);
                             newLines.Add(string.Format("\t{0}", LangCode));
                             newLines.Add(string.Format("\t{{"));
-                            newLines.Add(string.Format("\t\t{0} = {1}", key, value));
+                            newLines.Add(string.Format("\t\t{0} = {2}{1}", key, value, langTag));
                             newLines.Add(string.Format("\t}}"));
                             AddedTag = true;
                         }
@@ -343,7 +376,7 @@ namespace VSToolsForKSP.Refactoring
                     }
                     else if (lineKey == key && CurrentSectionPath == "/Localization/" + LangCode)
                     {
-                        OutputManager.WriteLine("\tKey found in file - Updating it: {0}={1}", key, value);
+                        OutputManager.WriteLine("\tKey found in file - Updating it: {0} = {2}{1}", key, value, langTag);
                         newLines.Add(string.Format("\t\t{0} = {1}", key, value));
                         AddedTag = true;
 

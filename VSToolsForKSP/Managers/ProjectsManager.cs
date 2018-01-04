@@ -85,6 +85,12 @@ namespace VSToolsForKSP.Managers
                 {
                     newProj.LocalizerSettings = new LocalizerSettings(newProj.name);
                     newProj.LocalizerSettings.ProjectSettings = LocalizerSettings.CreateFromXML<LocalizerProjectSettings>(newProj.FolderPath + "/.ksplocalizer.settings");
+
+                    if(newProj.LocalizerSettings.ProjectSettings.Templates.Count < 1)
+                    {
+                        newProj.LocalizerSettings.ProjectSettings.SaveTemplate("Default");
+                    }
+
                     if (File.Exists(newProj.FolderPath + "/.ksplocalizer.settings.user"))
                     {
                         newProj.LocalizerSettings.UserSettings = LocalizerSettings.CreateFromXML<LocalizerUserSettings>(newProj.FolderPath + "/.ksplocalizer.settings.user");

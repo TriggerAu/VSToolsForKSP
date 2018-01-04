@@ -65,6 +65,7 @@
     <Compile Include="Settings\BaseSettings.cs" />
     <Compile Include="Settings\BindableBase.cs" />
     <Compile Include="Settings\LocalizerSettings.cs" />
+    <Compile Include="Settings\LocalizerTemplateSettings.cs" />
     <Compile Include="Settings\LocalizerUserSettings.cs" />
     <Compile Include="Settings\LocalizerProjectSettings.cs" />
     <Compile Include="ToolWindows\LocalizerSettingsWindow.cs" />

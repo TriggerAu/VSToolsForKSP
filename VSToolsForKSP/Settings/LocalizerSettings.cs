@@ -11,7 +11,6 @@ namespace VSToolsForKSP.Settings
     {
         public LocalizerProjectSettings ProjectSettings { get; set; }
         public LocalizerUserSettings UserSettings { get; set; }
-
         public LocalizerSettings(string projectName)
         {
             ProjectSettings = new LocalizerProjectSettings(projectName);
