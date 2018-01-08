@@ -9,13 +9,17 @@ Author: TriggerAu
 ## Usage
 Once installed the Extension will provide refactors and options to help with Mod development. The current list includes:
 * Code Refactoring of strings to Localizer.Format calls (including writing the cfg files)
+* Code Refactoring of strings to Localization Tags (including writing the cfg files)
+* Templates to be able to store and apply different values for different configurations
 
 ![Refactor Preview](/images/RefactorPreviewOnly.png)
+
+![Refactor Preview](/images/RefactorPreviewOnly_TagOnly.png)
 
 ## Installation
 This is a Visual Studio Extension written for VS2017 (should be all editions)
 
-To install it you get the [Latest Release](https://github.com/TriggerAu/VSToolsForKSP/releases/latest) VSIX file and souble click it to install.
+To install it you get the [Latest Release](https://github.com/TriggerAu/VSToolsForKSP/releases/latest) VSIX file and double click it to install.
 ![Installing the extension](/images/InstallExtension.png)
 
 You can then check its installed in the usual **Extensions and Updates...** menu item
