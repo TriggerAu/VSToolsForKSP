@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VSToolsForKSP.Managers;
 
 namespace VSToolsForKSP.Settings
 {
@@ -29,13 +30,15 @@ namespace VSToolsForKSP.Settings
         }
 
         private int nextProjectId;
-        public int NextProjectID {
+        public int NextProjectID
+        {
             get { return nextProjectId; }
             set { Set(ref nextProjectId, value); }
         }
 
         private string baseCfgFile;
-        public string BaseCfgFile {
+        public string BaseCfgFile
+        {
             get { return baseCfgFile; }
             set { Set(ref baseCfgFile, value); }
         }
@@ -48,11 +51,17 @@ namespace VSToolsForKSP.Settings
         }
 
         private bool useMultiCFGFiles;
-
         public bool UseMultiCfgFiles
         {
             get { return useMultiCFGFiles; }
-            set { Set(ref useMultiCFGFiles , value); }
+            set { Set(ref useMultiCFGFiles, value); }
+        }
+
+        private bool useMultiAndBaseCFGFiles;
+        public bool UseMultiAndBaseCfgFiles
+        {
+            get { return useMultiAndBaseCFGFiles; }
+            set { Set(ref useMultiAndBaseCFGFiles, value); }
         }
 
         private string multiCfgFile;
@@ -62,6 +71,15 @@ namespace VSToolsForKSP.Settings
             set { Set(ref multiCfgFile, value); }
         }
 
+        private bool addLanguageCodePrefixToMultiFiles;
+        public bool AddLanguageCodePrefixToMultiFiles
+        {
+            get { return addLanguageCodePrefixToMultiFiles; }
+            set { Set(ref addLanguageCodePrefixToMultiFiles, value); }
+        }
+
+
+        public List<LocalizerTemplateSettings> Templates { get; set; }
 
         public LocalizerProjectSettings()
         {
@@ -73,6 +91,8 @@ namespace VSToolsForKSP.Settings
             LanguageCodes = "en-us,es-es,ja,ru,zh-cn";
             UseMultiCfgFiles = false;
             MultiCfgFile = "refactor_{LANGCODE}.cfg";
+            addLanguageCodePrefixToMultiFiles = true;
+            Templates = new List<LocalizerTemplateSettings>();
         }
         public LocalizerProjectSettings(string projectName) : this()
         {
@@ -91,6 +111,50 @@ namespace VSToolsForKSP.Settings
                 return Enum.GetValues(typeof(IDTypeEnum)).Cast<IDTypeEnum>().ToList<IDTypeEnum>();
             }
         }
+
+        public void SaveTemplate(string name)
+        {
+            LocalizerTemplateSettings t = new LocalizerTemplateSettings();
+
+            t.name = name;
+
+            t.BaseCfgFile = BaseCfgFile;
+            t.LanguageCodes = LanguageCodes;
+            t.AddLanguageCodePrefixToMultiFiles = AddLanguageCodePrefixToMultiFiles;
+            t.UseMultiCfgFiles = UseMultiCfgFiles;
+            t.UseMultiAndBaseCfgFiles = UseMultiAndBaseCfgFiles;
+            t.MultiCfgFile = MultiCfgFile;
+
+            //Add the new template to the array
+            for (int i = Templates.Count; i-- > 0;)
+            {
+                if (Templates[i].name == t.name)
+                {
+                    Templates.RemoveAt(i);
+                }
+            }
+            Templates.Add(t);
+
+            Templates = Templates.OrderBy(x => x.name).ToList();
+        }
+
+        public void ApplyTemplate(string name)
+        {
+            foreach (LocalizerTemplateSettings t in Templates)
+            {
+                if(t.name == name)
+                {
+                    BaseCfgFile = t.BaseCfgFile;
+                    LanguageCodes = t.LanguageCodes;
+                    AddLanguageCodePrefixToMultiFiles = t.AddLanguageCodePrefixToMultiFiles;
+                    UseMultiCfgFiles = t.UseMultiCfgFiles;
+                    UseMultiAndBaseCfgFiles = t.UseMultiAndBaseCfgFiles;
+                    MultiCfgFile = t.MultiCfgFile;
+
+                    return;
+                }
+            }
+            OutputManager.WriteLine("Template not found in settings:" + name);
+        }
     }
-    
 }

@@ -17,6 +17,7 @@ namespace VSToolsForKSP.ToolWindows
     using System.IO;
     using Microsoft.Win32;
     using VSToolsForKSP.Managers;
+    using System.Linq;
 
     /// <summary>
     /// Interaction logic for LocalizerSettingsWindowControl.
@@ -117,6 +118,7 @@ namespace VSToolsForKSP.ToolWindows
         private void ExtensionUtils_ProjectsListChanged(object sender, System.EventArgs e)
         {
             UpdateProjectsDropdown();
+            UpdateTemplatesDropdown();
         }
 
         private void TagTextChanged(object sender, TextChangedEventArgs e)
@@ -177,10 +179,43 @@ namespace VSToolsForKSP.ToolWindows
         private void cfgLanguageMultiFile_Changed(object sender, RoutedEventArgs e)
         {
             MultiFile.IsEnabled = CurrentProject.LocalizerSettings.ProjectSettings.UseMultiCfgFiles;
-            BaseFile.IsEnabled = !CurrentProject.LocalizerSettings.ProjectSettings.UseMultiCfgFiles;
-            BaseFileSelector.IsEnabled = !CurrentProject.LocalizerSettings.ProjectSettings.UseMultiCfgFiles;
+            cfgLanguageMultiAndBaseFile.IsEnabled = CurrentProject.LocalizerSettings.ProjectSettings.UseMultiCfgFiles;
+            BaseFile.IsEnabled = !CurrentProject.LocalizerSettings.ProjectSettings.UseMultiCfgFiles || CurrentProject.LocalizerSettings.ProjectSettings.UseMultiAndBaseCfgFiles;
+            BaseFileSelector.IsEnabled = !CurrentProject.LocalizerSettings.ProjectSettings.UseMultiCfgFiles || CurrentProject.LocalizerSettings.ProjectSettings.UseMultiAndBaseCfgFiles; ;
+            cfgLangPrefixMultiFile.IsEnabled = CurrentProject.LocalizerSettings.ProjectSettings.UseMultiCfgFiles;
 
             UpdateSampleText();
         }
+
+
+        private void SaveTemplate_Click(object sender, RoutedEventArgs e)
+        {
+            CurrentProject.LocalizerSettings.ProjectSettings.SaveTemplate(templateName.Text);
+            UpdateTemplatesDropdown(templateName.Text);
+        }
+
+        private void UpdateTemplatesDropdown(string value = "")
+        {
+            int valueIndex = 0;
+            ddlTemplates.Items.Clear();
+
+            CurrentProject.LocalizerSettings.ProjectSettings.Templates = CurrentProject.LocalizerSettings.ProjectSettings.Templates.OrderBy(x => x.name).ToList();
+
+            foreach (LocalizerTemplateSettings t in CurrentProject.LocalizerSettings.ProjectSettings.Templates)
+            {
+                ddlTemplates.Items.Add(t.name);
+                if(value != "" && t.name == value)
+                {
+                    valueIndex = ddlTemplates.Items.IndexOf(t.name);
+                }
+            }
+            ddlTemplates.SelectedItem = ddlTemplates.Items[valueIndex];
+        }
+
+        private void ApplyTemplate_Click(object sender, RoutedEventArgs e)
+        {
+            CurrentProject.LocalizerSettings.ProjectSettings.ApplyTemplate(ddlTemplates.SelectedItem.ToString());
+        }
+
     }
 }

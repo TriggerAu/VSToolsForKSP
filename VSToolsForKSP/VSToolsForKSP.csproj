@@ -60,11 +60,14 @@
     <Compile Include="Managers\ProjectDetails.cs" />
     <Compile Include="Managers\ProjectsManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Refactoring\StringRefactoring.cs" />
+    <Compile Include="Refactoring\RefactoringCodeProvider.cs" />
     <Compile Include="Refactoring\RefactoringCodeAction.cs" />
     <Compile Include="Refactoring\LocalizerFormatRefactoring.cs" />
     <Compile Include="Settings\BaseSettings.cs" />
     <Compile Include="Settings\BindableBase.cs" />
     <Compile Include="Settings\LocalizerSettings.cs" />
+    <Compile Include="Settings\LocalizerTemplateSettings.cs" />
     <Compile Include="Settings\LocalizerUserSettings.cs" />
     <Compile Include="Settings\LocalizerProjectSettings.cs" />
     <Compile Include="ToolWindows\LocalizerSettingsWindow.cs" />

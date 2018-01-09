@@ -18,7 +18,7 @@ using VSToolsForKSP.Managers;
 namespace VSToolsForKSP.Refactoring
 {
     [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(LocalizerFormatRefactoring)), Shared]
-    internal class LocalizerFormatRefactoring : RefactoringCodeProvider
+    internal class StringRefactoring : RefactoringCodeProvider
     {
         public sealed override async Task ComputeRefactoringsAsync(CodeRefactoringContext context)
         {
@@ -34,11 +34,19 @@ namespace VSToolsForKSP.Refactoring
             // Find the node at the selection.
             var node = root.FindNode(context.Span);
 
-            // Only offer a refactoring if the selected node is a string literal - be it an argument or standalone.
+            // Only offer a refactoring if the selected node is a string literal - be it an argument, standalone or attirbute value.
             var argument = node as ArgumentSyntax;
             if (argument != null)
             {
                 node = argument.Expression;
+            }
+            else
+            {
+                var attributeArgument = node as AttributeArgumentSyntax;
+                if(attributeArgument!= null)
+                {
+                    node = attributeArgument.Expression;
+                }
             }
 
             var typeDecl = node as LiteralExpressionSyntax;
@@ -48,7 +56,7 @@ namespace VSToolsForKSP.Refactoring
             }
 
             // Create the action if we are all good
-            var action = RefactoringCodeAction.Create("Replace String with KSP Localizer.Format", c => ReplaceStringWithLocalizerFormat(context.Document, typeDecl, c));
+            var action = RefactoringCodeAction.Create("Replace String with KSP Localization Tag", c => ReplaceStringWithAutoLOC(context.Document, typeDecl, c));
 
             action.OnChangesWithNoPreview += Action_OnDocumentChanged;
 
@@ -60,7 +68,7 @@ namespace VSToolsForKSP.Refactoring
 
         private string newIDKey = "";
         private string newValue = "";
-        private async Task<Document> ReplaceStringWithLocalizerFormat(Document document, LiteralExpressionSyntax litDecl, CancellationToken cancellationToken)
+        private async Task<Document> ReplaceStringWithAutoLOC(Document document, LiteralExpressionSyntax litDecl, CancellationToken cancellationToken)
         {
             try
             {
@@ -80,18 +88,19 @@ namespace VSToolsForKSP.Refactoring
                 try
                 {
                     //Set up the call to Localizer.Format
-                    IdentifierNameSyntax localizer = SyntaxFactory.IdentifierName("Localizer");
-                    IdentifierNameSyntax format = SyntaxFactory.IdentifierName("Format");
-                    MemberAccessExpressionSyntax memberaccess = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, localizer, format);
+                    //IdentifierNameSyntax localizer = SyntaxFactory.IdentifierName("Localizer");
+                    //IdentifierNameSyntax format = SyntaxFactory.IdentifierName("Format");
+                    //MemberAccessExpressionSyntax memberaccess = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, localizer, format);
 
-                    ArgumentSyntax arg = SyntaxFactory.Argument(SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(newIDKey)));
-                    SeparatedSyntaxList<ArgumentSyntax> argList = SyntaxFactory.SeparatedList(new[] { arg });
+                    //ArgumentSyntax arg = SyntaxFactory.Argument(SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(newIDKey)));
+                    //SeparatedSyntaxList<ArgumentSyntax> argList = SyntaxFactory.SeparatedList(new[] { arg });
 
-                    SyntaxAnnotation syntaxAnnotation = new SyntaxAnnotation("LocalizerFormat");
+                    SyntaxAnnotation syntaxAnnotation = new SyntaxAnnotation("LocalizedString");
 
                     SyntaxNode writecall =
-                        SyntaxFactory.InvocationExpression(memberaccess,
-                            SyntaxFactory.ArgumentList(argList)
+                        SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(newIDKey)
+                        //SyntaxFactory.InvocationExpression(memberaccess,
+                        //    SyntaxFactory.ArgumentList(argList)
 
                     ).WithAdditionalAnnotations(syntaxAnnotation).WithTriviaFrom(litDecl);
 
