@@ -64,10 +64,6 @@ namespace VSToolsForKSP.Refactoring
             context.RegisterRefactoring(action);
         }
 
-        private ProjectDetails currentProject;
-
-        private string newIDKey = "";
-        private string newValue = "";
         private async Task<Document> ReplaceStringWithAutoLOC(Document document, LiteralExpressionSyntax litDecl, CancellationToken cancellationToken)
         {
             try
