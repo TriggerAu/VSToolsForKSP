@@ -88,7 +88,7 @@ namespace VSToolsForKSP.Settings
             IDType = IDTypeEnum.ProjectBased;
             NextProjectID = 1000000;
             BaseCfgFile = "refactor.cfg";
-            LanguageCodes = "en-us,es-es,ja,ru,zh-cn";
+            LanguageCodes = "en-us,es-es,ja,ru,zh-cn,de-de,fr-fr,it-it,pt-br";
             UseMultiCfgFiles = false;
             MultiCfgFile = "refactor_{LANGCODE}.cfg";
             addLanguageCodePrefixToMultiFiles = true;
