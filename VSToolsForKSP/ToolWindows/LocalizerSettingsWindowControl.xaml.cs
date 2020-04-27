@@ -160,6 +160,7 @@ namespace VSToolsForKSP.ToolWindows
         private void CreateSettings_Click(object sender, RoutedEventArgs e)
         {
             CurrentProject.LocalizerSettings = new LocalizerSettings(CurrentProject.name);
+            CurrentProject.LocalizerSettings.ProjectSettings.SaveTemplate("Default");
             CurrentProject.LocalizerSettings.WriteAllXML(CurrentProject.FolderPath);
             UpdateProjectsDropdown();
             UpdateTemplatesDropdown();
@@ -206,17 +207,20 @@ namespace VSToolsForKSP.ToolWindows
             int valueIndex = 0;
             ddlTemplates.Items.Clear();
 
-            CurrentProject.LocalizerSettings.ProjectSettings.Templates = CurrentProject.LocalizerSettings.ProjectSettings.Templates.OrderBy(x => x.name).ToList();
-
-            foreach (LocalizerTemplateSettings t in CurrentProject.LocalizerSettings.ProjectSettings.Templates)
+            if (CurrentProject.LocalizerSettings != null)
             {
-                ddlTemplates.Items.Add(t.name);
-                if(value != "" && t.name == value)
+                CurrentProject.LocalizerSettings.ProjectSettings.Templates = CurrentProject.LocalizerSettings.ProjectSettings.Templates.OrderBy(x => x.name).ToList();
+
+                foreach (LocalizerTemplateSettings t in CurrentProject.LocalizerSettings.ProjectSettings.Templates)
                 {
-                    valueIndex = ddlTemplates.Items.IndexOf(t.name);
+                    ddlTemplates.Items.Add(t.name);
+                    if (value != "" && t.name == value)
+                    {
+                        valueIndex = ddlTemplates.Items.IndexOf(t.name);
+                    }
                 }
+                ddlTemplates.SelectedItem = ddlTemplates.Items[valueIndex];
             }
-            ddlTemplates.SelectedItem = ddlTemplates.Items[valueIndex];
         }
 
         private void ApplyTemplate_Click(object sender, RoutedEventArgs e)

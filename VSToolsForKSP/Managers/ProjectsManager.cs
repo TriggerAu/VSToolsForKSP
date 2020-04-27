@@ -28,6 +28,9 @@ namespace VSToolsForKSP.Managers
             solutionEvents.ProjectAdded += ProjectsChanged;
             solutionEvents.ProjectRemoved += ProjectsChanged;
             solutionEvents.AfterClosing += SolutionChanged;
+
+            //Set up the lists on first open
+            SolutionChanged();
         }
 
         #endregion
