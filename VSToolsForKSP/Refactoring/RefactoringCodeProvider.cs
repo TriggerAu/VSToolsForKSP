@@ -20,10 +20,10 @@ namespace VSToolsForKSP.Refactoring
 {
     internal abstract class RefactoringCodeProvider : CodeRefactoringProvider
     {
-        private ProjectDetails currentProject;
+        protected ProjectDetails currentProject;
 
-        private string newIDKey = "";
-        private string newValue = "";
+        protected string newIDKey = "";
+        protected string newValue = "";
 
         #region Common Methods
         /// <summary>

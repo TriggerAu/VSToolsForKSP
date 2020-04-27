@@ -42,6 +42,7 @@ namespace VSToolsForKSP.ToolWindows
             CurrentProject = null;
 
             UpdateProjectsDropdown();
+            UpdateTemplatesDropdown();
 
             VSToolsForKSP.Refactoring.LocalizerFormatRefactoring.OnRefactorComplete += LocalizerFormatRefactoring_OnRefactorComplete;
         }
@@ -161,6 +162,7 @@ namespace VSToolsForKSP.ToolWindows
             CurrentProject.LocalizerSettings = new LocalizerSettings(CurrentProject.name);
             CurrentProject.LocalizerSettings.WriteAllXML(CurrentProject.FolderPath);
             UpdateProjectsDropdown();
+            UpdateTemplatesDropdown();
         }
 
         private void BaseFileSelector_Click(object sender, RoutedEventArgs e)
@@ -196,6 +198,11 @@ namespace VSToolsForKSP.ToolWindows
 
         private void UpdateTemplatesDropdown(string value = "")
         {
+            if (CurrentProject == null)
+            {
+                return;
+            }
+
             int valueIndex = 0;
             ddlTemplates.Items.Clear();
 

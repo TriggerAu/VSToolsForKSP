@@ -17,7 +17,7 @@ using VSToolsForKSP.Managers;
 
 namespace VSToolsForKSP.Refactoring
 {
-    [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(LocalizerFormatRefactoring)), Shared]
+    [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(StringRefactoring)), Shared]
     internal class StringRefactoring : RefactoringCodeProvider
     {
         public sealed override async Task ComputeRefactoringsAsync(CodeRefactoringContext context)
@@ -56,7 +56,7 @@ namespace VSToolsForKSP.Refactoring
             }
 
             // Create the action if we are all good
-            var action = RefactoringCodeAction.Create("Replace String with KSP Localization Tag", c => ReplaceStringWithAutoLOC(context.Document, typeDecl, c));
+            var action = RefactoringCodeAction.Create("Replace String with KSP Localizer Tag Only", c => ReplaceStringWithAutoLOC(context.Document, typeDecl, c));
 
             action.OnChangesWithNoPreview += Action_OnDocumentChanged;
 
@@ -64,10 +64,6 @@ namespace VSToolsForKSP.Refactoring
             context.RegisterRefactoring(action);
         }
 
-        private ProjectDetails currentProject;
-
-        private string newIDKey = "";
-        private string newValue = "";
         private async Task<Document> ReplaceStringWithAutoLOC(Document document, LiteralExpressionSyntax litDecl, CancellationToken cancellationToken)
         {
             try
